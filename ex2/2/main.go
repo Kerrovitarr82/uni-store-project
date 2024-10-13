@@ -4,29 +4,27 @@ import (
 	"fmt"
 )
 
-func isLeapYear(year int) bool {
-	if year%4 == 0 {
-		if year%100 == 0 {
-			if year%400 == 0 {
-				return true
-			}
-			return false
-		}
+func isPol(str string) bool {
+	revStr := ""
+	for _, v := range str {
+		revStr = string(v) + revStr
+	}
+	if str == revStr {
 		return true
 	}
 	return false
 }
 
 func main() {
-	year := 0
-	fmt.Println("Ввведите год")
-	_, err := fmt.Scanf("%d", &year)
+	str := ""
+	fmt.Print("Введите слово: ")
+	_, err := fmt.Scanf("%s", &str)
 	if err != nil {
 		return
 	}
-	if isLeapYear(year) {
-		fmt.Printf("%v - високосный\n", year)
+	if isPol(str) {
+		fmt.Printf("%v - палиндром\n", str)
 	} else {
-		fmt.Printf("%v - невисокосный", year)
+		fmt.Printf("%v - не палиндром", str)
 	}
 }

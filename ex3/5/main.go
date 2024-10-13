@@ -4,25 +4,31 @@ import (
 	"fmt"
 )
 
-func arrSum(arr [5]int) (sum int) {
-	n := len(arr)
-
-	for i := 0; i < n; i++ {
-		sum += arr[i]
+func euclideanAlgorithm(a, b int) int {
+	for b != 0 {
+		a, b = b, a%b
 	}
-
-	return sum
+	return a
 }
 
 func main() {
-	var arr [5]int
-	fmt.Println("Введите числа массива размером 5 через пробел.")
-	for i, _ := range arr {
-		_, err := fmt.Scanf("%d", &arr[i])
-		if err != nil {
-			fmt.Printf(err.Error())
-			return
-		}
+	var a, b int
+
+	fmt.Print("Введите первое число: ")
+	_, err := fmt.Scanf("%d", &a)
+	if err != nil {
+		fmt.Println("Ошибка ввода:", err)
+		return
 	}
-	fmt.Printf("%v - сумма элементов массива\n", arrSum(arr))
+
+	fmt.Print("Введите второе число: ")
+	_, err = fmt.Scanf("%d", &b)
+	if err != nil {
+		fmt.Println("Ошибка ввода:", err)
+		return
+	}
+
+	gcd := euclideanAlgorithm(a, b)
+
+	fmt.Printf("Наибольший общий делитель %d и %d равен %d\n", a, b, gcd)
 }

@@ -1,30 +1,30 @@
 package main
 
 import (
+	"bufio"
 	"fmt"
+	"os"
+	"strings"
 )
 
-func whichAgeGroup(age int) string {
-	switch {
-	case age < 10:
-		return "ребенок"
-	case age >= 10 && age <= 19:
-		return "подросток"
-	case age > 19 && age < 70:
-		return "взрослый"
-	case age > 70:
-		return "пожилой"
-	default:
-		return "неизвестно"
+func findSubstring(s string) (longestWord string) {
+	str := strings.Split(s, " ")
+	for _, v := range str {
+		if len(v) > len(longestWord) {
+			longestWord = v
+		}
 	}
+	return longestWord
 }
 
 func main() {
-	x := 0
-	fmt.Println("Ввведите возраст.")
-	_, err := fmt.Scanf("%d", &x)
-	if err != nil {
-		return
-	}
-	fmt.Printf("Этот человек - %v.\n", whichAgeGroup(x))
+	reader := bufio.NewReader(os.Stdin)
+
+	fmt.Print("Введите предложение: ")
+	str, _ := reader.ReadString('\n')
+	str = strings.TrimSpace(str)
+
+	longestWord := findSubstring(str)
+
+	fmt.Printf("Самое длинное слово в предложении: %s\n", longestWord)
 }

@@ -2,26 +2,37 @@ package main
 
 import (
 	"fmt"
+	"math"
+	"sort"
 )
 
-func sum(num [4]int) [4]int {
-	num[0] *= 2
-	num[1] *= 2
-	num[2] *= 2
-	num[3] *= 2
-	return num
-
+func sortByAbs(arr []int) {
+	sort.Slice(arr, func(i, j int) bool {
+		return math.Abs(float64(arr[i])) < math.Abs(float64(arr[j]))
+	})
 }
 
 func main() {
-	num := [4]int{0, 0, 0, 0}
-	fmt.Println("Введите 4 числа через пробел")
-	for i, _ := range num {
-		_, err := fmt.Scanf("%d", &num[i])
+	var n int
+	fmt.Print("Введите количество элементов массива: ")
+	_, err := fmt.Scan(&n)
+	if err != nil || n <= 0 {
+		fmt.Println("Ошибка: необходимо ввести положительное целое число")
+		return
+	}
+
+	arr := make([]int, n)
+
+	fmt.Println("Введите элементы массива:")
+	for i := 0; i < n; i++ {
+		_, err := fmt.Scan(&arr[i])
 		if err != nil {
+			fmt.Println("Ошибка ввода. Убедитесь, что вы вводите целые числа.")
 			return
 		}
 	}
 
-	fmt.Printf("Итоговый массив %v", sum(num))
+	fmt.Println("Исходный массив:", arr)
+	sortByAbs(arr)
+	fmt.Println("Отсортированный массив по абсолютным значениям:", arr)
 }

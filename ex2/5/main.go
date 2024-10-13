@@ -4,23 +4,29 @@ import (
 	"fmt"
 )
 
-func divisionOnFiveAndThree(num int) bool {
-	if num%3 == 0 && num%5 == 0 {
+func isLeapYear(year int) bool {
+	if year%4 == 0 {
+		if year%100 == 0 {
+			if year%400 == 0 {
+				return true
+			}
+			return false
+		}
 		return true
 	}
 	return false
 }
 
 func main() {
-	x := 0
-	fmt.Println("Ввведите число.")
-	_, err := fmt.Scanf("%d", &x)
+	year := 0
+	fmt.Println("Ввведите год")
+	_, err := fmt.Scanf("%d", &year)
 	if err != nil {
 		return
 	}
-	if divisionOnFiveAndThree(x) {
-		fmt.Printf("Делится.\n")
+	if isLeapYear(year) {
+		fmt.Printf("%v - високосный\n", year)
 	} else {
-		fmt.Printf("Не делится.\n")
+		fmt.Printf("%v - невисокосный", year)
 	}
 }

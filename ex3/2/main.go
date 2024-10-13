@@ -28,7 +28,7 @@ func fib(n int) []int {
 
 func main() {
 	x := 0
-	fmt.Println("Ввведите число.")
+	fmt.Println("Введите число.")
 	_, err := fmt.Scanf("%d", &x)
 	if err != nil {
 		return

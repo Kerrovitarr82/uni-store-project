@@ -4,29 +4,19 @@ import (
 	"fmt"
 )
 
-func isPrime(n int) bool {
-	if n <= 1 {
-		return false
+func strReverse(str string) (revStr string) {
+	for _, v := range str {
+		revStr = string(v) + revStr
 	}
-	for i := 2; i*i <= n; i++ {
-		if n%i == 0 {
-			return false
-		}
-	}
-	return true
+	return revStr
 }
 
 func main() {
-	n := 0
-	fmt.Println("Введите число, до которого нужно найти простые числа.")
-	_, err := fmt.Scanf("%d", &n)
+	str := ""
+	fmt.Print("Введите слово: ")
+	_, err := fmt.Scanf("%s", &str)
 	if err != nil {
-		fmt.Printf(err.Error())
 		return
 	}
-	for i := 0; i <= n; i++ {
-		if isPrime(i) {
-			fmt.Printf("%d ", i)
-		}
-	}
+	fmt.Printf("%v - перевернутая строка\n", strReverse(str))
 }

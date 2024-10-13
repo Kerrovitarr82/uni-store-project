@@ -1,24 +1,55 @@
 package main
 
 import (
+	"bufio"
 	"fmt"
-	"math"
+	"os"
+	"strings"
 )
 
-func distanceBetweenPoints(points [4]float64) float64 {
-	return math.Sqrt(math.Pow(points[2]-points[0], 2) + math.Pow(points[3]-points[1], 2))
+func findSubstring(s, sub string) int {
+	runesS := []rune(s)
+	runesSub := []rune(sub)
 
-}
+	lenS := len(runesS)
+	lenSub := len(runesSub)
 
-func main() {
-	points := [4]float64{}
-	fmt.Println("Введите значения точек в таком порядке: x1 y1 x2 y2")
-	for i, _ := range points {
-		_, err := fmt.Scanf("%f", &points[i])
-		if err != nil {
-			return
+	if lenSub == 0 || lenSub > lenS {
+		return -1
+	}
+
+	for i := 0; i <= lenS-lenSub; i++ {
+		match := true
+		for j := 0; j < lenSub; j++ {
+			if runesS[i+j] != runesSub[j] {
+				match = false
+				break
+			}
+		}
+		if match {
+			return i
 		}
 	}
 
-	fmt.Printf("Расстояние между точками = %v", distanceBetweenPoints(points))
+	return -1
+}
+
+func main() {
+	reader := bufio.NewReader(os.Stdin)
+
+	fmt.Print("Введите основную строку: ")
+	str, _ := reader.ReadString('\n')
+	str = strings.TrimSpace(str)
+
+	fmt.Print("Введите подстроку для поиска: ")
+	substr, _ := reader.ReadString('\n')
+	substr = strings.TrimSpace(substr)
+
+	position := findSubstring(str, substr)
+
+	if position != -1 {
+		fmt.Printf("Подстрока найдена на позиции: %d\n", position)
+	} else {
+		fmt.Println("Подстрока не найдена")
+	}
 }
