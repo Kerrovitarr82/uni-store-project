@@ -4,34 +4,36 @@ import (
 	"fmt"
 )
 
-func fib(n int) []int {
-	if n <= 0 {
-		return []int{}
+func isPrime(n int) bool {
+	if n <= 1 {
+		return false
 	}
-	if n == 1 {
-		return []int{0}
+	for i := 2; i*i <= n; i++ {
+		if n%i == 0 {
+			return false
+		}
 	}
-	if n == 2 {
-		return []int{0, 1}
-	}
-
-	final := make([]int, n)
-	final[0] = 0
-	final[1] = 1
-
-	for i := 2; i < n; i++ {
-		final[i] = final[i-1] + final[i-2]
-	}
-
-	return final
+	return true
 }
 
 func main() {
-	x := 0
-	fmt.Println("Введите число.")
-	_, err := fmt.Scanf("%d", &x)
+	start := 0
+	end := 0
+	fmt.Print("Введите начало диапазона простых чисел: ")
+	_, err := fmt.Scanf("%d", &start)
 	if err != nil {
+		fmt.Printf(err.Error())
 		return
 	}
-	fmt.Printf("%v - Числа Фибоначи до %v\n", fib(x), x)
+	fmt.Print("Введите конец диапазона простых чисел: ")
+	_, err = fmt.Scanf("%d", &end)
+	if err != nil {
+		fmt.Printf(err.Error())
+		return
+	}
+	for i := start; i <= end; i++ {
+		if isPrime(i) {
+			fmt.Printf("%d ", i)
+		}
+	}
 }
