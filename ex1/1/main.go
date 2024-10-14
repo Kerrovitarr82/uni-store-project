@@ -2,65 +2,32 @@ package main
 
 import (
 	"fmt"
-	"math"
 )
 
-var keys = [...]string{
-	"0", "1", "2", "3", "4", "5", "6", "7", "8", "9",
-	"A", "B", "C", "D", "E", "F", "G", "H", "I", "J",
-	"K", "L", "M", "N", "O", "P", "Q", "R", "S", "T",
-	"U", "V", "W", "X", "Y", "Z",
-}
-
-func Index(v string) int {
-	for i, vs := range keys {
-		if vs == v {
-			return i
+func isPrime(n int) (bool, int) {
+	if n <= 1 {
+		return false, 0
+	}
+	for i := 2; i*i <= n; i++ {
+		if n%i == 0 {
+			return false, i
 		}
 	}
-	return -1
-}
-
-func reverse(str string) (result string) {
-	for _, v := range str {
-		result = string(v) + result
-	}
-	return
-}
-
-func switchNotation(num string, startNotation int, endNotation int) (final string) {
-	buff := 0
-	for i := 0; i < len(num); i++ {
-		buff += Index(string(num[i])) * int(math.Pow(float64(startNotation), float64(len(num)-i-1)))
-	}
-	for buff >= endNotation {
-		final += keys[buff%endNotation]
-		buff /= endNotation
-	}
-	final += keys[buff]
-
-	return reverse(final)
-
+	return true, 0
 }
 
 func main() {
-	num := ""
-	fmt.Println("Введите число")
-	_, err := fmt.Scanln(&num)
+	n := 0
+	fmt.Print("Введите число: ")
+	_, err := fmt.Scanf("%d", &n)
 	if err != nil {
+		fmt.Printf(err.Error())
 		return
 	}
-	startNotation := 0
-	fmt.Println("Введите систему счисления вашего числа")
-	_, err = fmt.Scanln(&startNotation)
-	if err != nil {
-		return
+	prime, divider := isPrime(n)
+	if prime {
+		fmt.Printf("%v - простое", n)
+	} else {
+		fmt.Printf("%v - не простое. %v - делитель", n, divider)
 	}
-	endNotation := 0
-	fmt.Println("Введите конечную систему счисления")
-	_, err = fmt.Scanln(&endNotation)
-	if err != nil {
-		return
-	}
-	fmt.Printf("Итог %v\n", switchNotation(num, startNotation, endNotation))
 }
