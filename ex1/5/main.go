@@ -4,31 +4,26 @@ import (
 	"fmt"
 )
 
-var memo = make(map[int]int)
-
-func fibonacci(n int) int {
+func isPrime(n int) bool {
 	if n <= 1 {
-		return n
+		return false
 	}
-
-	if val, found := memo[n]; found {
-		return val
+	for i := 2; i*i <= n; i++ {
+		if n%i == 0 {
+			return false
+		}
 	}
-
-	result := fibonacci(n-1) + fibonacci(n-2)
-
-	memo[n] = result
-
-	return result
+	return true
 }
 
 func main() {
 	var n int
-	fmt.Print("Введите номер числа Фибоначчи: ")
-	_, err := fmt.Scan(&n)
-	if err != nil {
-		return
-	}
+	fmt.Print("Введите число: ")
+	fmt.Scan(&n)
 
-	fmt.Printf("Число Фибоначчи для %d: %d\n", n, fibonacci(n))
+	if isPrime(n) {
+		fmt.Println("Число простое.")
+	} else {
+		fmt.Println("Число не простое.")
+	}
 }

@@ -4,37 +4,27 @@ import (
 	"fmt"
 )
 
-func palindromeNumber(num int) (bool, error) {
-	if num < 0 {
-		return false, fmt.Errorf("error: negative number")
+func findMax(arr []int) int {
+	max := arr[0]
+	for _, num := range arr {
+		if num > max {
+			max = num
+		}
 	}
-	original := num
-	reversed := 0
-
-	for num > 0 {
-		lastDigit := num % 10
-		reversed = reversed*10 + lastDigit
-		num = num / 10
-	}
-
-	return original == reversed, nil
+	return max
 }
 
 func main() {
 	var n int
-	fmt.Print("Введите число, которое надо проверить на палиндром: ")
-	_, err := fmt.Scan(&n)
-	if err != nil {
-		return
+	fmt.Print("Введите количество элементов в массиве: ")
+	fmt.Scan(&n)
+
+	arr := make([]int, n)
+	fmt.Println("Введите элементы массива:")
+	for i := 0; i < n; i++ {
+		fmt.Scan(&arr[i])
 	}
-	isPalindrome, err := palindromeNumber(n)
-	if err != nil {
-		fmt.Println(err)
-	} else {
-		if isPalindrome {
-			fmt.Println("Число является палиндромом")
-		} else {
-			fmt.Println("Число НЕ является палиндромом")
-		}
-	}
+
+	max := findMax(arr)
+	fmt.Printf("Максимальный элемент в массиве: %d\n", max)
 }

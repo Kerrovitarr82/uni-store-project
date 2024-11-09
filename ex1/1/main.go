@@ -4,30 +4,17 @@ import (
 	"fmt"
 )
 
-func isPrime(n int) (bool, int) {
-	if n <= 1 {
-		return false, 0
-	}
-	for i := 2; i*i <= n; i++ {
-		if n%i == 0 {
-			return false, i
-		}
-	}
-	return true, 0
+func triangleArea(base float64, height float64) float64 {
+	return 0.5 * base * height
 }
 
 func main() {
-	n := 0
-	fmt.Print("Введите число: ")
-	_, err := fmt.Scanf("%d", &n)
-	if err != nil {
-		fmt.Printf(err.Error())
-		return
-	}
-	prime, divider := isPrime(n)
-	if prime {
-		fmt.Printf("%v - простое", n)
-	} else {
-		fmt.Printf("%v - не простое. %v - делитель", n, divider)
-	}
+	var base, height float64
+	fmt.Print("Введите длину основания треугольника: ")
+	fmt.Scan(&base)
+	fmt.Print("Введите высоту треугольника: ")
+	fmt.Scan(&height)
+
+	area := triangleArea(base, height)
+	fmt.Printf("Площадь треугольника: %.2f\n", area)
 }

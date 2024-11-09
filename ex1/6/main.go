@@ -4,24 +4,33 @@ import (
 	"fmt"
 )
 
-func reverseNumber(num int) int {
-	reversed := 0
-
-	for num != 0 {
-		lastDigit := num % 10
-		reversed = reversed*10 + lastDigit
-		num /= 10
+func isPrime(n int) bool {
+	if n <= 1 {
+		return false
 	}
-	return reversed
+	for i := 2; i*i <= n; i++ {
+		if n%i == 0 {
+			return false
+		}
+	}
+	return true
+}
+
+func generatePrimes(limit int) []int {
+	var primes []int
+	for i := 2; i <= limit; i++ {
+		if isPrime(i) {
+			primes = append(primes, i)
+		}
+	}
+	return primes
 }
 
 func main() {
-	var num int
-	fmt.Print("Введите целое число: ")
-	_, err := fmt.Scan(&num)
-	if err != nil {
-		return
-	}
+	var limit int
+	fmt.Print("Введите предел для простых чисел: ")
+	fmt.Scan(&limit)
 
-	fmt.Println("Перевернутое число:", reverseNumber(num))
+	primes := generatePrimes(limit)
+	fmt.Println("Простые числа до", limit, ":", primes)
 }

@@ -1,28 +1,30 @@
 package main
 
-import "fmt"
+import (
+	"fmt"
+)
 
-func matrixMult() [10][10]int {
-	var matrix [10][10]int
-	for i := 0; i < 10; i++ {
-		for j := 0; j < 10; j++ {
-			matrix[i][j] = 0
-		}
+func isPol(str string) bool {
+	revStr := ""
+	for _, v := range str {
+		revStr = string(v) + revStr
 	}
-	for i := 0; i < 10; i++ {
-		for j := 0; j < 10; j++ {
-			matrix[i][j] = (i + 1) * (j + 1)
-		}
+	if str == revStr {
+		return true
 	}
-	return matrix
+	return false
 }
 
 func main() {
-	matrix := matrixMult()
-	for _, row := range matrix {
-		for _, col := range row {
-			fmt.Print(col, " ")
-		}
-		fmt.Println()
+	str := ""
+	fmt.Print("Введите слово: ")
+	_, err := fmt.Scanf("%s", &str)
+	if err != nil {
+		return
+	}
+	if isPol(str) {
+		fmt.Printf("%v - палиндром\n", str)
+	} else {
+		fmt.Printf("%v - не палиндром", str)
 	}
 }

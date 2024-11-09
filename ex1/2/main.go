@@ -2,33 +2,25 @@ package main
 
 import (
 	"fmt"
+	"sort"
 )
 
-func euclideanAlgorithm(a, b int) int {
-	for b != 0 {
-		a, b = b, a%b
-	}
-	return a
+func sortArray(arr []int) []int {
+	sort.Ints(arr)
+	return arr
 }
 
 func main() {
-	var a, b int
+	var n int
+	fmt.Print("Введите количество элементов в массиве: ")
+	fmt.Scan(&n)
 
-	fmt.Print("Введите первое число: ")
-	_, err := fmt.Scanf("%d", &a)
-	if err != nil {
-		fmt.Println("Ошибка ввода:", err)
-		return
+	arr := make([]int, n)
+	fmt.Println("Введите элементы массива:")
+	for i := 0; i < n; i++ {
+		fmt.Scan(&arr[i])
 	}
 
-	fmt.Print("Введите второе число: ")
-	_, err = fmt.Scanf("%d", &b)
-	if err != nil {
-		fmt.Println("Ошибка ввода:", err)
-		return
-	}
-
-	gcd := euclideanAlgorithm(a, b)
-
-	fmt.Printf("Наибольший общий делитель %d и %d равен %d\n", a, b, gcd)
+	sortedArr := sortArray(arr)
+	fmt.Println("Отсортированный массив:", sortedArr)
 }
