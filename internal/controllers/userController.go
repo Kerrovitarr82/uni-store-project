@@ -38,6 +38,18 @@ func VerifyPassword(userPassword string, providedPassword string) bool {
 	return check
 }
 
+// Signup godoc
+// @Summary Registers a new user
+// @Description This endpoint allows you to register a new user by providing required fields: name, second_name, email, phone_number, password, and role_id. It validates the input, hashes the password, and saves the user in the database.
+// @Tags Users
+// @Accept json
+// @Produce json
+// @Param user body models.User true "User data to register"
+// @Success 201 {object} map[string]interface{} "User registered successfully"
+// @Failure 400 {object} map[string]interface{} "Invalid input"
+// @Failure 409 {object} map[string]interface{} "Email or phone number already in use"
+// @Failure 500 {object} map[string]interface{} "Internal server error"
+// @Router /api/v1/auth/signup [post]
 func Signup() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var ctx, cancel = context.WithTimeout(context.Background(), 15*time.Second)
@@ -86,6 +98,18 @@ func Signup() gin.HandlerFunc {
 	}
 }
 
+// Login godoc
+// @Summary Logs in a user and returns access and refresh tokens
+// @Description This endpoint allows the user to log in by providing email and password. It checks if the user exists, verifies the password, generates access and refresh tokens, updates the tokens in the database, and sets them as cookies in the response.
+// @Tags Users
+// @Accept json
+// @Produce json
+// @Param user body models.User true "User credentials (email and password)"
+// @Success 200 {object} models.User "Successfully logged in and returned user data"
+// @Failure 400 {object} map[string]interface{} "Invalid input"
+// @Failure 401 {object} map[string]interface{} "Email or password is incorrect"
+// @Failure 500 {object} map[string]interface{} "Internal server error"
+// @Router /api/v1/auth/login [post]
 func Login() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var ctx, cancel = context.WithTimeout(context.Background(), 15*time.Second)
@@ -128,6 +152,17 @@ func Login() gin.HandlerFunc {
 	}
 }
 
+// GetUserById godoc
+// @Summary Get a user by ID
+// @Description Fetches a user by their ID from the database. The user making the request must be authorized to access the requested user data. User can get access only to their data. Admin can get access to all users data.
+// @Tags Users
+// @Accept json
+// @Produce json
+// @Param user_id path string true "User ID"
+// @Success 200 {object} models.User "Successfully retrieved the user data"
+// @Failure 400 {object} map[string]interface{} "Invalid user ID"
+// @Failure 500 {object} map[string]interface{} "Failed to fetch user"
+// @Router /api/v1/users/{user_id} [get]
 func GetUserById() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		userId := c.Param("user_id")
@@ -148,6 +183,19 @@ func GetUserById() gin.HandlerFunc {
 	}
 }
 
+// GetPaginatedUsers godoc
+// @Summary Get users with pagination
+// @Description Fetches a paginated list of users from the database. Only admins can access this endpoint.
+// @Tags Users
+// @Accept json
+// @Produce json
+// @Param limit query int false "Limit number of results" default(10)
+// @Param offset query int false "Offset for pagination" default(0)
+// @Success 200 {array} models.User "Successfully retrieved the paginated users"
+// @Failure 400 {object} map[string]interface{} "Invalid query parameters"
+// @Failure 403 {object} map[string]interface{} "Forbidden"
+// @Failure 500 {object} map[string]interface{} "Failed to fetch users"
+// @Router /api/v1/users [get]
 func GetPaginatedUsers() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		if err := helpers.CheckUserType(c, "ADMIN"); err != nil {
@@ -181,6 +229,16 @@ func GetPaginatedUsers() gin.HandlerFunc {
 	}
 }
 
+// GetAllUsers godoc
+// @Summary Get all users
+// @Description Fetches a list of all users from the database. Only admins can access this endpoint.
+// @Tags Users
+// @Accept json
+// @Produce json
+// @Success 200 {array} models.User "Successfully retrieved all users"
+// @Failure 403 {object} map[string]interface{} "Forbidden"
+// @Failure 500 {object} map[string]interface{} "Failed to fetch users"
+// @Router /api/v1/users [get]
 func GetAllUsers() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		if err := helpers.CheckUserType(c, "ADMIN"); err != nil {
@@ -201,10 +259,28 @@ func GetAllUsers() gin.HandlerFunc {
 	}
 }
 
+// UpdateUser godoc
+// @Summary Update a user's data
+// @Description Allows updating specific fields of a user. The user making the request must be authorized to update the specified user data. User can update only their own data. Admin can update all users data.
+// @Tags Users
+// @Accept json
+// @Produce json
+// @Param user_id path string true "User ID"
+// @Param user body models.User true "User data to update"
+// @Success 200 {object} models.User "Successfully updated the user"
+// @Failure 400 {object} map[string]interface{} "Invalid input"
+// @Failure 404 {object} map[string]interface{} "User not found"
+// @Failure 500 {object} map[string]interface{} "Failed to update user"
+// @Router /api/v1/users/{user_id} [patch]
 func UpdateUser() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		// Получаем ID пользователя из URL
 		userID := c.Param("user_id")
+
+		if err := helpers.MatchUserTypeToUid(c, userID); err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+			return
+		}
 
 		// Создаем контекст с тайм-аутом
 		var ctx, cancel = context.WithTimeout(context.Background(), 15*time.Second)

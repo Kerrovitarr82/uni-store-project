@@ -18,7 +18,7 @@ type User struct {
 	Role         Role           `gorm:"foreignKey:RoleID" json:"role"`
 	CreatedAt    time.Time      `json:"created_at"`
 	UpdatedAt    time.Time      `json:"updated_at"`
-	DeletedAt    gorm.DeletedAt `gorm:"index" json:"deleted_at"`
+	DeletedAt    gorm.DeletedAt `gorm:"index" json:"deleted_at" swaggerignore:"true"`
 	Token        string         `json:"token"`
 	RefreshToken string         `json:"refresh_token"`
 }
@@ -29,5 +29,5 @@ type Role struct {
 	Description string         `json:"description"`
 	CreatedAt   time.Time      `json:"created_at"`
 	UpdatedAt   time.Time      `json:"updated_at"`
-	DeletedAt   gorm.DeletedAt `gorm:"index" json:"deleted_at"`
+	DeletedAt   gorm.DeletedAt `gorm:"index" json:"deleted_at" swaggerignore:"true"`
 }

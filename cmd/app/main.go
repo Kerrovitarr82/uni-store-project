@@ -1,10 +1,13 @@
 package main
 
 import (
+	_ "TIPPr4/api/docs"
 	"TIPPr4/internal/database"
 	"TIPPr4/internal/transport"
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
+	swaggerfiles "github.com/swaggo/files"
+	ginSwagger "github.com/swaggo/gin-swagger"
 	"log"
 	"os"
 )
@@ -40,9 +43,12 @@ func main() {
 		port = "8000"
 	}
 
+	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerfiles.Handler))
+	log.Printf("Swagger UI is available at: http://localhost:%s/swagger/index.html\n", port)
 	// Запуск сервера
 	err := router.Run(":" + port)
 	if err != nil {
 		log.Fatalf("Error starting server on port %s: %v", port, err)
 	}
+
 }

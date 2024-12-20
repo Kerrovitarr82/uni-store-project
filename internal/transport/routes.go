@@ -16,7 +16,6 @@ func InitRoutes(router *gin.Engine) {
 			auth.POST("/login", controllers.Login())   // Логин пользователя
 		}
 
-		// Группировка маршрутов для пользователей
 		users := v1.Group("/users")
 		{
 			users.Use(middleware.Authenticate())              // Применяем аутентификацию ко всем маршрутам в этой группе
@@ -24,6 +23,16 @@ func InitRoutes(router *gin.Engine) {
 			users.GET("/", controllers.GetPaginatedUsers())   // Получение списка пользователей с пагинацией
 			users.GET("/all", controllers.GetAllUsers())      // Получение всех пользователей (можно сделать приватным, например, для админов)
 			users.PATCH("/", controllers.UpdateUser())        // Обновление данных пользователя
+		}
+
+		roles := v1.Group("/roles")
+		{
+			roles.Use(middleware.Authenticate())
+			roles.POST("", controllers.CreateRole())
+			roles.GET("", controllers.GetAllRoles())
+			roles.GET("/:role_id", controllers.GetRoleById())
+			roles.PATCH("/:role_id", controllers.UpdateRole())
+			roles.DELETE("/:role_id", controllers.DeleteRole())
 		}
 	}
 
