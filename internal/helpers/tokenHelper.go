@@ -4,6 +4,7 @@ import (
 	"TIPPr4/internal/database"
 	"TIPPr4/internal/models"
 	"context"
+	"fmt"
 	"github.com/golang-jwt/jwt/v5"
 	"os"
 	"time"
@@ -62,4 +63,33 @@ func UpdateAllTokens(signedToken string, signedRefreshToken string, userId int) 
 	}
 
 	return nil
+}
+
+func ValidateToken(signedToken string) (*SignedDetails, error) {
+	// Парсим токен с передачей структуры, которая будет содержать данные о токене
+	token, err := jwt.ParseWithClaims(
+		signedToken,
+		&SignedDetails{},
+		func(token *jwt.Token) (interface{}, error) {
+			return []byte(os.Getenv("SECRET_KEY")), nil
+		},
+	)
+
+	// Если произошла ошибка при парсинге токена, возвращаем ошибку
+	if err != nil {
+		return nil, fmt.Errorf("failed to parse token: %w", err)
+	}
+
+	// Преобразуем claims в ожидаемый тип и проверяем
+	claims, ok := token.Claims.(*SignedDetails)
+	if !ok {
+		return nil, fmt.Errorf("the token has invalid claims")
+	}
+
+	// Проверяем, не истек ли срок действия токена
+	if claims.RegisteredClaims.ExpiresAt.Unix() < time.Now().UTC().Unix() {
+		return nil, fmt.Errorf("token is expired")
+	}
+
+	return claims, nil
 }
