@@ -4,12 +4,12 @@ import (
 	"TIPPr4/internal/database"
 	"TIPPr4/internal/helpers"
 	"TIPPr4/internal/models"
+	"TIPPr4/internal/myUtils"
 	"context"
 	"errors"
 	"github.com/gin-gonic/gin"
 	"github.com/go-playground/validator/v10"
 	"github.com/jackc/pgx/v5/pgconn"
-	"golang.org/x/crypto/bcrypt"
 	"gorm.io/gorm"
 	"log"
 	"net/http"
@@ -19,32 +19,13 @@ import (
 
 var validate = validator.New()
 
-func HashPassword(password string) (string, error) {
-	bytes, err := bcrypt.GenerateFromPassword([]byte(password), 14)
-	if err != nil {
-		log.Panic(err)
-		return "", err
-	}
-	return string(bytes), nil
-}
-
-func VerifyPassword(userPassword string, providedPassword string) bool {
-	err := bcrypt.CompareHashAndPassword([]byte(providedPassword), []byte(userPassword))
-	check := true
-
-	if err != nil {
-		check = false
-	}
-	return check
-}
-
 // Signup godoc
 // @Summary Registers a new user
 // @Description This endpoint allows you to register a new user by providing required fields: name, second_name, email, phone_number, password, and role_id. It validates the input, hashes the password, and saves the user in the database.
 // @Tags Users
 // @Accept json
 // @Produce json
-// @Param user body models.User true "User data to register"
+// @Param signup body dto.SignupDTO true "User data to register"
 // @Success 201 {object} map[string]interface{} "User registered successfully"
 // @Failure 400 {object} map[string]interface{} "Invalid input"
 // @Failure 409 {object} map[string]interface{} "Email or phone number already in use"
@@ -65,7 +46,7 @@ func Signup() gin.HandlerFunc {
 			c.JSON(http.StatusBadRequest, gin.H{"error": validationErr.Error()})
 			return
 		}
-		password, err := HashPassword(user.Password)
+		password, err := myUtils.HashPassword(user.Password)
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to hash password"})
 			return
@@ -104,7 +85,7 @@ func Signup() gin.HandlerFunc {
 // @Tags Users
 // @Accept json
 // @Produce json
-// @Param user body models.User true "User credentials (email and password)"
+// @Param login body dto.LoginDTO true "User credentials (email and password)"
 // @Success 200 {object} models.User "Successfully logged in and returned user data"
 // @Failure 400 {object} map[string]interface{} "Invalid input"
 // @Failure 401 {object} map[string]interface{} "Email or password is incorrect"
@@ -127,7 +108,7 @@ func Login() gin.HandlerFunc {
 			return
 		}
 
-		passwordIsValid := VerifyPassword(user.Password, foundUser.Password)
+		passwordIsValid := myUtils.VerifyPassword(user.Password, foundUser.Password)
 		if !passwordIsValid {
 			c.JSON(http.StatusUnauthorized, gin.H{"error": "Email or password is incorrect"})
 			return
@@ -322,7 +303,7 @@ func UpdateUser() gin.HandlerFunc {
 		}
 		if userUpdates.Password != "" {
 			// Необходимо хэшировать пароль перед сохранением в базе
-			hashedPassword, err := HashPassword(userUpdates.Password)
+			hashedPassword, err := myUtils.HashPassword(userUpdates.Password)
 			if err != nil {
 				c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to hash password"})
 				return
@@ -332,7 +313,8 @@ func UpdateUser() gin.HandlerFunc {
 		if userUpdates.PaymentInfo != "" {
 			user.PaymentInfo = userUpdates.PaymentInfo
 		}
-		if userUpdates.RoleID != 0 {
+		err := helpers.CheckUserType(c, "ADMIN")
+		if err == nil && userUpdates.RoleID != 0 {
 			user.RoleID = userUpdates.RoleID
 		}
 
