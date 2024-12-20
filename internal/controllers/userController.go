@@ -113,6 +113,10 @@ func Login() gin.HandlerFunc {
 			return
 		}
 
+		// Установка токена в cookie
+		c.SetCookie("token", token, 3600*2, "/", "localhost", false, true)
+		c.SetCookie("refreshToken", refreshToken, 3600*24*7, "/", "localhost", false, true)
+
 		c.JSON(http.StatusOK, foundUser)
 	}
 }
