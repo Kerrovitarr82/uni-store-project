@@ -31,11 +31,11 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "description": "User credentials (email and password)",
-                        "name": "user",
+                        "name": "login",
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/models.User"
+                            "$ref": "#/definitions/dto.LoginDTO"
                         }
                     }
                 ],
@@ -86,11 +86,11 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "description": "User data to register",
-                        "name": "user",
+                        "name": "signup",
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/models.User"
+                            "$ref": "#/definitions/dto.SignupDTO"
                         }
                     }
                 ],
@@ -530,12 +530,51 @@ const docTemplate = `{
         }
     },
     "definitions": {
+        "dto.LoginDTO": {
+            "type": "object",
+            "required": [
+                "email",
+                "password"
+            ],
+            "properties": {
+                "email": {
+                    "type": "string"
+                },
+                "password": {
+                    "type": "string"
+                }
+            }
+        },
+        "dto.SignupDTO": {
+            "type": "object",
+            "required": [
+                "email",
+                "name",
+                "password",
+                "second_name"
+            ],
+            "properties": {
+                "email": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "password": {
+                    "type": "string",
+                    "minLength": 6
+                },
+                "second_name": {
+                    "type": "string"
+                },
+                "third_name": {
+                    "type": "string"
+                }
+            }
+        },
         "models.Role": {
             "type": "object",
             "properties": {
-                "created_at": {
-                    "type": "string"
-                },
                 "description": {
                     "type": "string"
                 },
@@ -543,9 +582,6 @@ const docTemplate = `{
                     "type": "integer"
                 },
                 "type": {
-                    "type": "string"
-                },
-                "updated_at": {
                     "type": "string"
                 }
             }
@@ -561,14 +597,8 @@ const docTemplate = `{
                 "second_name"
             ],
             "properties": {
-                "created_at": {
-                    "type": "string"
-                },
                 "email": {
                     "type": "string"
-                },
-                "id": {
-                    "type": "integer"
                 },
                 "name": {
                     "type": "string",
@@ -579,17 +609,8 @@ const docTemplate = `{
                     "type": "string",
                     "minLength": 6
                 },
-                "payment_info": {
-                    "type": "string"
-                },
                 "phone_number": {
                     "type": "string"
-                },
-                "refresh_token": {
-                    "type": "string"
-                },
-                "role": {
-                    "$ref": "#/definitions/models.Role"
                 },
                 "role_id": {
                     "type": "integer"
@@ -601,12 +622,6 @@ const docTemplate = `{
                 },
                 "third_name": {
                     "type": "string"
-                },
-                "token": {
-                    "type": "string"
-                },
-                "updated_at": {
-                    "type": "string"
                 }
             }
         }
@@ -617,7 +632,7 @@ const docTemplate = `{
 var SwaggerInfo = &swag.Spec{
 	Version:          "1.0",
 	Host:             "localhost:8080",
-	BasePath:         "/api/v1",
+	BasePath:         "",
 	Schemes:          []string{},
 	Title:            "Game Store",
 	Description:      "REST-API for game store",

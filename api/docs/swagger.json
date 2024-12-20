@@ -7,7 +7,6 @@
         "version": "1.0"
     },
     "host": "localhost:8080",
-    "basePath": "/api/v1",
     "paths": {
         "/api/v1/auth/login": {
             "post": {
@@ -25,11 +24,11 @@
                 "parameters": [
                     {
                         "description": "User credentials (email and password)",
-                        "name": "user",
+                        "name": "login",
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/models.User"
+                            "$ref": "#/definitions/dto.LoginDTO"
                         }
                     }
                 ],
@@ -80,11 +79,11 @@
                 "parameters": [
                     {
                         "description": "User data to register",
-                        "name": "user",
+                        "name": "signup",
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/models.User"
+                            "$ref": "#/definitions/dto.SignupDTO"
                         }
                     }
                 ],
@@ -524,12 +523,51 @@
         }
     },
     "definitions": {
+        "dto.LoginDTO": {
+            "type": "object",
+            "required": [
+                "email",
+                "password"
+            ],
+            "properties": {
+                "email": {
+                    "type": "string"
+                },
+                "password": {
+                    "type": "string"
+                }
+            }
+        },
+        "dto.SignupDTO": {
+            "type": "object",
+            "required": [
+                "email",
+                "name",
+                "password",
+                "second_name"
+            ],
+            "properties": {
+                "email": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "password": {
+                    "type": "string",
+                    "minLength": 6
+                },
+                "second_name": {
+                    "type": "string"
+                },
+                "third_name": {
+                    "type": "string"
+                }
+            }
+        },
         "models.Role": {
             "type": "object",
             "properties": {
-                "created_at": {
-                    "type": "string"
-                },
                 "description": {
                     "type": "string"
                 },
@@ -537,9 +575,6 @@
                     "type": "integer"
                 },
                 "type": {
-                    "type": "string"
-                },
-                "updated_at": {
                     "type": "string"
                 }
             }
@@ -555,14 +590,8 @@
                 "second_name"
             ],
             "properties": {
-                "created_at": {
-                    "type": "string"
-                },
                 "email": {
                     "type": "string"
-                },
-                "id": {
-                    "type": "integer"
                 },
                 "name": {
                     "type": "string",
@@ -573,17 +602,8 @@
                     "type": "string",
                     "minLength": 6
                 },
-                "payment_info": {
-                    "type": "string"
-                },
                 "phone_number": {
                     "type": "string"
-                },
-                "refresh_token": {
-                    "type": "string"
-                },
-                "role": {
-                    "$ref": "#/definitions/models.Role"
                 },
                 "role_id": {
                     "type": "integer"
@@ -594,12 +614,6 @@
                     "minLength": 2
                 },
                 "third_name": {
-                    "type": "string"
-                },
-                "token": {
-                    "type": "string"
-                },
-                "updated_at": {
                     "type": "string"
                 }
             }

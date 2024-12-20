@@ -1,26 +1,46 @@
-basePath: /api/v1
 definitions:
+  dto.LoginDTO:
+    properties:
+      email:
+        type: string
+      password:
+        type: string
+    required:
+    - email
+    - password
+    type: object
+  dto.SignupDTO:
+    properties:
+      email:
+        type: string
+      name:
+        type: string
+      password:
+        minLength: 6
+        type: string
+      second_name:
+        type: string
+      third_name:
+        type: string
+    required:
+    - email
+    - name
+    - password
+    - second_name
+    type: object
   models.Role:
     properties:
-      created_at:
-        type: string
       description:
         type: string
       id:
         type: integer
       type:
         type: string
-      updated_at:
-        type: string
     type: object
   models.User:
     properties:
-      created_at:
-        type: string
       email:
         type: string
-      id:
-        type: integer
       name:
         maxLength: 100
         minLength: 2
@@ -28,14 +48,8 @@ definitions:
       password:
         minLength: 6
         type: string
-      payment_info:
-        type: string
       phone_number:
         type: string
-      refresh_token:
-        type: string
-      role:
-        $ref: '#/definitions/models.Role'
       role_id:
         type: integer
       second_name:
@@ -43,10 +57,6 @@ definitions:
         minLength: 2
         type: string
       third_name:
-        type: string
-      token:
-        type: string
-      updated_at:
         type: string
     required:
     - email
@@ -74,10 +84,10 @@ paths:
       parameters:
       - description: User credentials (email and password)
         in: body
-        name: user
+        name: login
         required: true
         schema:
-          $ref: '#/definitions/models.User'
+          $ref: '#/definitions/dto.LoginDTO'
       produces:
       - application/json
       responses:
@@ -113,10 +123,10 @@ paths:
       parameters:
       - description: User data to register
         in: body
-        name: user
+        name: signup
         required: true
         schema:
-          $ref: '#/definitions/models.User'
+          $ref: '#/definitions/dto.SignupDTO'
       produces:
       - application/json
       responses:
