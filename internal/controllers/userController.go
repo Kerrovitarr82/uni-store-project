@@ -12,6 +12,7 @@ import (
 	"golang.org/x/crypto/bcrypt"
 	"log"
 	"net/http"
+	"strconv"
 	"time"
 )
 
@@ -136,8 +137,55 @@ func GetUserById() gin.HandlerFunc {
 	}
 }
 
+func GetPaginatedUsers() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		if err := helpers.CheckUserType(c, "ADMIN"); err != nil {
+			c.JSON(http.StatusForbidden, gin.H{"error": err.Error()})
+			return
+		}
+		var ctx, cancel = context.WithTimeout(context.Background(), 15*time.Second)
+		defer cancel()
+		var users []models.User
+
+		// Извлекаем параметры пагинации (limit и offset) из запроса
+		limit, err := strconv.Atoi(c.DefaultQuery("limit", "10")) // По умолчанию 10 записей
+		if err != nil || limit <= 0 {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid limit value"})
+			return
+		}
+		offset, err := strconv.Atoi(c.DefaultQuery("offset", "0")) // По умолчанию без пропуска
+		if err != nil || offset < 0 {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid offset value"})
+			return
+		}
+
+		query := database.DB.WithContext(ctx).Limit(limit).Offset(offset)
+		if err := query.Find(&users).Error; err != nil {
+			log.Printf("Error fetching users: %v", err)
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch users"})
+			return
+		}
+
+		c.JSON(http.StatusOK, users)
+	}
+}
+
 func GetAllUsers() gin.HandlerFunc {
 	return func(c *gin.Context) {
+		if err := helpers.CheckUserType(c, "ADMIN"); err != nil {
+			c.JSON(http.StatusForbidden, gin.H{"error": err.Error()})
+			return
+		}
+		var ctx, cancel = context.WithTimeout(context.Background(), 15*time.Second)
+		defer cancel()
+		var users []models.User
 
+		err := database.DB.WithContext(ctx).Find(&users).Error
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch users"})
+			return
+		}
+
+		c.JSON(http.StatusOK, users)
 	}
 }
