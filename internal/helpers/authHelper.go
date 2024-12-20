@@ -6,25 +6,25 @@ import (
 )
 
 func CheckUserType(c *gin.Context, role string) (err error) {
-	userType := c.GetString("user_type")
+	userRole := c.GetString("user_role") //берется из токена
 	err = nil
-	if userType != role {
+	if userRole != role {
 		err = errors.New("Unauthorized to access this resource")
 		return err
 	}
 	return err
 }
 
-// Проверка уровня доступа для юзера TODO получение роли учесть
+// Проверка уровня доступа для юзера
 func MatchUserTypeToUid(c *gin.Context, userId string) (err error) {
-	userType := c.GetString("user_type")
-	uid := c.GetString("uid")
+	userRole := c.GetString("user_role") //берется из токена
+	uid := c.GetString("uid")            //берется из токена
 	err = nil
 
-	if userType == "USER" && uid != userId {
+	if userRole == "USER" && uid != userId {
 		err = errors.New("Unauthorized to access this resource")
 		return err
 	}
-	err = CheckUserType(c, userType)
+	err = CheckUserType(c, userRole)
 	return err
 }
