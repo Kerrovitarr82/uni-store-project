@@ -5,7 +5,6 @@ import (
 	"TIPPr4/internal/models"
 	"context"
 	"github.com/golang-jwt/jwt/v5"
-	"log"
 	"os"
 	"time"
 )
@@ -27,33 +26,40 @@ func GenerateAllTokens(email string, name string, secondName string, userRole st
 		Uid:        uid,
 		UserRole:   userRole,
 		RegisteredClaims: jwt.RegisteredClaims{
-			ExpiresAt: jwt.NewNumericDate(time.Now().Add(24 * time.Hour)),
+			ExpiresAt: jwt.NewNumericDate(time.Now().Add(2 * time.Hour)),
 			IssuedAt:  jwt.NewNumericDate(time.Now()),
 		},
 	}
 
 	refreshClaims := SignedDetails{
 		RegisteredClaims: jwt.RegisteredClaims{
-			ExpiresAt: jwt.NewNumericDate(time.Now().Add(24 * time.Hour)),
+			ExpiresAt: jwt.NewNumericDate(time.Now().Add(24 * 7 * time.Hour)),
 		},
 	}
 	token, err := jwt.NewWithClaims(jwt.SigningMethodHS256, claims).SignedString([]byte(os.Getenv("SECRET_KEY")))
 	refreshToken, err := jwt.NewWithClaims(jwt.SigningMethodHS256, refreshClaims).SignedString([]byte(os.Getenv("SECRET_KEY")))
 	if err != nil {
-		log.Panic(err)
-		return
+		return token, refreshToken, err
 	}
 	return token, refreshToken, nil
 }
 
-func UpdateAllTokens(signedToken string, signedRefreshToken string, userId id) (err error) {
-	var ctx, cancel = context.WithTimeout(context.Background(), 100*time.Second)
+func UpdateAllTokens(signedToken string, signedRefreshToken string, userId int) error {
+	// Устанавливаем тайм-аут для операции
+	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
 	defer cancel()
-	var user models.User
 
-	if err := database.DB.WithContext(ctx).First(&user, userId).Error; err != nil {
-		return err // тут приколы
+	// Подготавливаем обновляемые данные
+	updates := map[string]interface{}{
+		"token":         signedToken,
+		"refresh_token": signedRefreshToken,
+		"updated_at":    time.Now(),
 	}
 
-	return
+	// Выполняем обновление токенов в бд
+	if err := database.DB.WithContext(ctx).Model(&models.User{}).Where("id = ?", userId).Updates(updates).Error; err != nil {
+		return err
+	}
+
+	return nil
 }
