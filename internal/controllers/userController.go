@@ -6,7 +6,6 @@ import (
 	"TIPPr4/internal/models"
 	"context"
 	"errors"
-	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/go-playground/validator/v10"
 	"github.com/jackc/pgx/v5/pgconn"
@@ -26,21 +25,19 @@ func HashPassword(password string) string {
 	return string(bytes)
 }
 
-func VerifyPassword(userPassword string, providedPassword string) (bool, string) {
+func VerifyPassword(userPassword string, providedPassword string) bool {
 	err := bcrypt.CompareHashAndPassword([]byte(providedPassword), []byte(userPassword))
 	check := true
-	msg := ""
 
 	if err != nil {
-		msg = fmt.Sprintf("email of password is incorrect")
 		check = false
 	}
-	return check, msg
+	return check
 }
 
 func Signup() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		var ctx, cancel = context.WithTimeout(context.Background(), 100*time.Second)
+		var ctx, cancel = context.WithTimeout(context.Background(), 15*time.Second)
 		defer cancel()
 		var user models.User
 
@@ -84,7 +81,7 @@ func Signup() gin.HandlerFunc {
 
 func Login() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		var ctx, cancel = context.WithTimeout(context.Background(), 100*time.Second)
+		var ctx, cancel = context.WithTimeout(context.Background(), 15*time.Second)
 		defer cancel()
 		var user models.User
 		var foundUser models.User
@@ -95,18 +92,27 @@ func Login() gin.HandlerFunc {
 		}
 		err := database.DB.WithContext(ctx).First(&foundUser, "email = ?", user.Email).Error
 		if err != nil {
-			c.JSON(http.StatusInternalServerError, gin.H{"error": "Email or password is incorrect"})
+			c.JSON(http.StatusUnauthorized, gin.H{"error": "Email or password is incorrect"})
 			return
 		}
 
-		passwordIsValid, msg := VerifyPassword(user.Password, foundUser.Password)
+		passwordIsValid := VerifyPassword(user.Password, foundUser.Password)
 		if !passwordIsValid {
-			c.JSON(http.StatusInternalServerError, gin.H{"error": msg})
+			c.JSON(http.StatusUnauthorized, gin.H{"error": "Email or password is incorrect"})
 			return
 		}
 
-		token, refreshToken, _ := helpers.GenerateAllTokens(foundUser.Email, foundUser.Name, foundUser.SecondName, foundUser.Role.Type, foundUser.ID)
+		token, refreshToken, err := helpers.GenerateAllTokens(foundUser.Email, foundUser.Name, foundUser.SecondName, foundUser.Role.Type, foundUser.ID)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Token generation failed"})
+		}
+		err = helpers.UpdateAllTokens(token, refreshToken, foundUser.ID)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Can't update tokens in DB"})
+			return
+		}
 
+		c.JSON(http.StatusOK, foundUser)
 	}
 }
 
