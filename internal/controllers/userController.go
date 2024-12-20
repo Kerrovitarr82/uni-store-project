@@ -10,6 +10,7 @@ import (
 	"github.com/go-playground/validator/v10"
 	"github.com/jackc/pgx/v5/pgconn"
 	"golang.org/x/crypto/bcrypt"
+	"gorm.io/gorm"
 	"log"
 	"net/http"
 	"strconv"
@@ -18,12 +19,13 @@ import (
 
 var validate = validator.New()
 
-func HashPassword(password string) string {
+func HashPassword(password string) (string, error) {
 	bytes, err := bcrypt.GenerateFromPassword([]byte(password), 14)
 	if err != nil {
 		log.Panic(err)
+		return "", err
 	}
-	return string(bytes)
+	return string(bytes), nil
 }
 
 func VerifyPassword(userPassword string, providedPassword string) bool {
@@ -51,7 +53,11 @@ func Signup() gin.HandlerFunc {
 			c.JSON(http.StatusBadRequest, gin.H{"error": validationErr.Error()})
 			return
 		}
-		password := HashPassword(user.Password)
+		password, err := HashPassword(user.Password)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to hash password"})
+			return
+		}
 		user.Password = password
 		user.CreatedAt, _ = time.Parse(time.RFC3339, time.Now().Format(time.RFC3339))
 		user.UpdatedAt, _ = time.Parse(time.RFC3339, time.Now().Format(time.RFC3339))
@@ -107,6 +113,7 @@ func Login() gin.HandlerFunc {
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": "Token generation failed"})
 		}
+
 		err = helpers.UpdateAllTokens(token, refreshToken, foundUser.ID)
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": "Can't update tokens in DB"})
@@ -191,5 +198,81 @@ func GetAllUsers() gin.HandlerFunc {
 		}
 
 		c.JSON(http.StatusOK, users)
+	}
+}
+
+func UpdateUser() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		// Получаем ID пользователя из URL
+		userID := c.Param("user_id")
+
+		// Создаем контекст с тайм-аутом
+		var ctx, cancel = context.WithTimeout(context.Background(), 15*time.Second)
+		defer cancel()
+
+		// Получаем данные пользователя, которые нужно обновить
+		var userUpdates models.User
+		if err := c.ShouldBindJSON(&userUpdates); err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid input", "details": err.Error()})
+			return
+		}
+
+		// Проверяем, существует ли пользователь в базе данных
+		var user models.User
+		if err := database.DB.WithContext(ctx).First(&user, "id = ?", userID).Error; err != nil {
+			if errors.Is(err, gorm.ErrRecordNotFound) {
+				c.JSON(http.StatusNotFound, gin.H{"error": "User not found"})
+				return
+			}
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to find user"})
+			return
+		}
+
+		// Обновляем только те поля, которые были переданы в запросе
+		if userUpdates.Name != "" {
+			user.Name = userUpdates.Name
+		}
+		if userUpdates.SecondName != "" {
+			user.SecondName = userUpdates.SecondName
+		}
+		if userUpdates.ThirdName != "" {
+			user.ThirdName = userUpdates.ThirdName
+		}
+		if userUpdates.Email != "" {
+			user.Email = userUpdates.Email
+		}
+		if userUpdates.PhoneNumber != "" {
+			user.PhoneNumber = userUpdates.PhoneNumber
+		}
+		if userUpdates.Password != "" {
+			// Необходимо хэшировать пароль перед сохранением в базе
+			hashedPassword, err := HashPassword(userUpdates.Password)
+			if err != nil {
+				c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to hash password"})
+				return
+			}
+			user.Password = hashedPassword
+		}
+		if userUpdates.PaymentInfo != "" {
+			user.PaymentInfo = userUpdates.PaymentInfo
+		}
+		if userUpdates.RoleID != 0 {
+			user.RoleID = userUpdates.RoleID
+		}
+
+		// Обновляем дату обновления
+		user.UpdatedAt = time.Now()
+
+		// Сохраняем обновленные данные пользователя в базу данных
+		if err := database.DB.WithContext(ctx).Save(&user).Error; err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to update user"})
+			return
+		}
+
+		// Возвращаем успешный ответ с обновленными данными
+		c.JSON(http.StatusOK, gin.H{
+			"message": "User updated successfully",
+			"user":    user,
+		})
 	}
 }
