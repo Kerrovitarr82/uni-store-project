@@ -9,18 +9,16 @@ func MigrateDB() {
 	err := DB.AutoMigrate(
 		&models.Role{},
 		&models.User{},
-		&models.Product{},
-		&models.Manufacturer{},
-		&models.Supplier{},
+		&models.Game{},
+		&models.Developer{},
 		&models.Category{},
+		&models.Restrict{},
 		&models.Review{},
 		&models.Order{},
-		&models.Delivery{},
 		&models.ShoppingCart{},
-		&models.ProductInCart{},
-		&models.ProductInFavorite{},
 		&models.Favorite{},
-		&models.ProductInOrder{},
+		&models.Library{},
+		&models.LibraryGame{},
 	)
 	if err != nil {
 		log.Fatalf("Migration failed: %v", err)

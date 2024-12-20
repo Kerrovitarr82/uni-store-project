@@ -10,8 +10,8 @@ type Review struct {
 	Title       string         `gorm:"not null" json:"title"`
 	Description string         `json:"description"`
 	Rating      int            `gorm:"not null" json:"rating"`
-	ProductID   int            `json:"product_id"`
-	Product     Product        `gorm:"foreignKey:ProductID" json:"product"`
+	GameId      int            `json:"game_id"`
+	Game        Game           `gorm:"foreignKey:GameId" json:"game"`
 	UserID      int            `json:"user_id"`
 	User        User           `gorm:"foreignKey:UserID" json:"user"`
 	CreatedAt   time.Time      `json:"created_at"`
