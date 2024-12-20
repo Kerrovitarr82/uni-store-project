@@ -24,7 +24,6 @@ func initConfig() {
 // @description	REST-API for game store
 
 // @host		localhost:8080
-// @BasePath	/api/v1
 func main() {
 	// Инициализация конфигурации
 	initConfig()
