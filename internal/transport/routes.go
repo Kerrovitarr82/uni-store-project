@@ -114,7 +114,7 @@ func InitRoutes(router *gin.Engine) {
 			reviews.Use(middleware.Authenticate())
 			reviews.POST("/", reviewControllers.CreateReview())
 			reviews.GET("/:review_id", reviewControllers.GetReviewByID())
-			reviews.GET("/:game_id", reviewControllers.GetReviewsByGameID())
+			reviews.GET("/game/:game_id", reviewControllers.GetReviewsByGameID())
 			reviews.PATCH("/:review_id/user/:user_id", reviewControllers.UpdateReview())
 			reviews.DELETE("/:review_id/user/:user_id", reviewControllers.DeleteReview())
 		}

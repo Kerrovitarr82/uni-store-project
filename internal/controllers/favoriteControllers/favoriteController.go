@@ -2,6 +2,7 @@ package favoriteControllers
 
 import (
 	"TIPPr4/internal/database"
+	"TIPPr4/internal/dto"
 	"TIPPr4/internal/helpers"
 	"TIPPr4/internal/models"
 	"context"
@@ -152,7 +153,7 @@ func RemoveGameFromFavorite() gin.HandlerFunc {
 // @Accept json
 // @Produce json
 // @Param user_id path int true "User ID"
-// @Success 200 {object} models.Favorite
+// @Success 200 {object} dto.FavoriteDTO
 // @Failure 404 {object} map[string]interface{}
 // @Failure 500 {object} map[string]interface{}
 // @Router /api/v1/favorite/{user_id} [get]
@@ -177,7 +178,13 @@ func GetFavorite() gin.HandlerFunc {
 			return
 		}
 
-		c.JSON(http.StatusOK, favorite)
+		respFav := dto.FavoriteDTO{
+			ID:     favorite.ID,
+			UserID: favorite.UserID,
+			Games:  favorite.Games,
+		}
+
+		c.JSON(http.StatusOK, respFav)
 	}
 }
 

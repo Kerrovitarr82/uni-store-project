@@ -1,4 +1,15 @@
 definitions:
+  dto.CartDTO:
+    properties:
+      games:
+        items:
+          $ref: '#/definitions/models.Game'
+        type: array
+      id:
+        type: integer
+      user_id:
+        type: integer
+    type: object
   dto.CategoryDTO:
     properties:
       description:
@@ -24,6 +35,17 @@ definitions:
     - description
     - email
     - name
+    type: object
+  dto.FavoriteDTO:
+    properties:
+      games:
+        items:
+          $ref: '#/definitions/models.Game'
+        type: array
+      id:
+        type: integer
+      user_id:
+        type: integer
     type: object
   dto.GameDTO:
     properties:
@@ -51,6 +73,17 @@ definitions:
     - developer_id
     - name
     - price
+    type: object
+  dto.LibraryDTO:
+    properties:
+      games:
+        items:
+          $ref: '#/definitions/models.Game'
+        type: array
+      id:
+        type: integer
+      user_id:
+        type: integer
     type: object
   dto.OrderDTO:
     properties:
@@ -172,19 +205,6 @@ definitions:
       updated_at:
         type: string
     type: object
-  models.Favorite:
-    properties:
-      games:
-        items:
-          $ref: '#/definitions/models.Game'
-        type: array
-      id:
-        type: integer
-      user_id:
-        type: integer
-      userControllers:
-        $ref: '#/definitions/models.User'
-    type: object
   models.Game:
     properties:
       age_restriction:
@@ -215,23 +235,6 @@ definitions:
         type: number
       updated_at:
         type: string
-    type: object
-  models.Library:
-    properties:
-      created_at:
-        type: string
-      games:
-        items:
-          $ref: '#/definitions/models.Game'
-        type: array
-      id:
-        type: integer
-      updated_at:
-        type: string
-      user_id:
-        type: integer
-      userControllers:
-        $ref: '#/definitions/models.User'
     type: object
   models.Restrict:
     properties:
@@ -277,19 +280,6 @@ definitions:
         type: string
       updated_at:
         type: string
-    type: object
-  models.ShoppingCart:
-    properties:
-      games:
-        items:
-          $ref: '#/definitions/models.Game'
-        type: array
-      id:
-        type: integer
-      user:
-        $ref: '#/definitions/models.User'
-      user_id:
-        type: integer
     type: object
   models.User:
     properties:
@@ -438,7 +428,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/models.ShoppingCart'
+            $ref: '#/definitions/dto.CartDTO'
         "404":
           description: Not Found
           schema:
@@ -959,7 +949,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/models.Favorite'
+            $ref: '#/definitions/dto.FavoriteDTO'
         "404":
           description: Not Found
           schema:
@@ -1293,7 +1283,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/models.Library'
+            $ref: '#/definitions/dto.LibraryDTO'
         "404":
           description: Not Found
           schema:

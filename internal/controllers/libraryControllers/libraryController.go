@@ -2,6 +2,7 @@ package libraryControllers
 
 import (
 	"TIPPr4/internal/database"
+	"TIPPr4/internal/dto"
 	"TIPPr4/internal/helpers"
 	"TIPPr4/internal/models"
 	"context"
@@ -19,7 +20,7 @@ import (
 // @Accept json
 // @Produce json
 // @Param user_id path int true "User ID"
-// @Success 200 {object} models.Library
+// @Success 200 {object} dto.LibraryDTO
 // @Failure 404 {object} map[string]interface{}
 // @Failure 500 {object} map[string]interface{}
 // @Router /api/v1/library/{user_id} [get]
@@ -44,6 +45,12 @@ func GetLibrary() gin.HandlerFunc {
 			return
 		}
 
-		c.JSON(http.StatusOK, library)
+		respLib := dto.LibraryDTO{
+			ID:     library.ID,
+			UserID: library.UserID,
+			Games:  library.Games,
+		}
+
+		c.JSON(http.StatusOK, respLib)
 	}
 }

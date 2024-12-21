@@ -2,6 +2,7 @@ package cartControllers
 
 import (
 	"TIPPr4/internal/database"
+	"TIPPr4/internal/dto"
 	"TIPPr4/internal/helpers"
 	"TIPPr4/internal/models"
 	"context"
@@ -154,7 +155,7 @@ func RemoveGameFromCart() gin.HandlerFunc {
 // @Accept json
 // @Produce json
 // @Param user_id path int true "User ID"
-// @Success 200 {object} models.ShoppingCart
+// @Success 200 {object} dto.CartDTO
 // @Failure 404 {object} map[string]interface{}
 // @Failure 500 {object} map[string]interface{}
 // @Router /api/v1/cart/{user_id} [get]
@@ -179,7 +180,13 @@ func GetCart() gin.HandlerFunc {
 			return
 		}
 
-		c.JSON(http.StatusOK, cart)
+		respCart := dto.CartDTO{
+			ID:     cart.ID,
+			UserID: cart.UserId,
+			Games:  cart.Games,
+		}
+
+		c.JSON(http.StatusOK, respCart)
 	}
 }
 

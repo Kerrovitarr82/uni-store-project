@@ -48,7 +48,7 @@ func CreateOrderFromCart() gin.HandlerFunc {
 			return
 		}
 
-		if err := database.DB.WithContext(ctx).First(&library, userID).Error; err != nil {
+		if err := database.DB.WithContext(ctx).Where("user_id = ?", userID).First(&library).Error; err != nil {
 			if errors.Is(err, gorm.ErrRecordNotFound) {
 				c.JSON(http.StatusNotFound, gin.H{"error": "User library not found"})
 				return

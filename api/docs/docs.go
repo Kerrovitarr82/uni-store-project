@@ -152,7 +152,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/models.ShoppingCart"
+                            "$ref": "#/definitions/dto.CartDTO"
                         }
                     },
                     "404": {
@@ -919,7 +919,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/models.Favorite"
+                            "$ref": "#/definitions/dto.FavoriteDTO"
                         }
                     },
                     "404": {
@@ -1410,7 +1410,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/models.Library"
+                            "$ref": "#/definitions/dto.LibraryDTO"
                         }
                     },
                     "404": {
@@ -2597,6 +2597,23 @@ const docTemplate = `{
         }
     },
     "definitions": {
+        "dto.CartDTO": {
+            "type": "object",
+            "properties": {
+                "games": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/models.Game"
+                    }
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "user_id": {
+                    "type": "integer"
+                }
+            }
+        },
         "dto.CategoryDTO": {
             "type": "object",
             "required": [
@@ -2632,6 +2649,23 @@ const docTemplate = `{
                 },
                 "name": {
                     "type": "string"
+                }
+            }
+        },
+        "dto.FavoriteDTO": {
+            "type": "object",
+            "properties": {
+                "games": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/models.Game"
+                    }
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "user_id": {
+                    "type": "integer"
                 }
             }
         },
@@ -2672,6 +2706,23 @@ const docTemplate = `{
                 },
                 "size": {
                     "type": "number"
+                }
+            }
+        },
+        "dto.LibraryDTO": {
+            "type": "object",
+            "properties": {
+                "games": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/models.Game"
+                    }
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "user_id": {
+                    "type": "integer"
                 }
             }
         },
@@ -2856,26 +2907,6 @@ const docTemplate = `{
                 }
             }
         },
-        "models.Favorite": {
-            "type": "object",
-            "properties": {
-                "games": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/models.Game"
-                    }
-                },
-                "id": {
-                    "type": "integer"
-                },
-                "userControllers": {
-                    "$ref": "#/definitions/models.User"
-                },
-                "user_id": {
-                    "type": "integer"
-                }
-            }
-        },
         "models.Game": {
             "type": "object",
             "properties": {
@@ -2920,32 +2951,6 @@ const docTemplate = `{
                 },
                 "updated_at": {
                     "type": "string"
-                }
-            }
-        },
-        "models.Library": {
-            "type": "object",
-            "properties": {
-                "created_at": {
-                    "type": "string"
-                },
-                "games": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/models.Game"
-                    }
-                },
-                "id": {
-                    "type": "integer"
-                },
-                "updated_at": {
-                    "type": "string"
-                },
-                "userControllers": {
-                    "$ref": "#/definitions/models.User"
-                },
-                "user_id": {
-                    "type": "integer"
                 }
             }
         },
@@ -3015,26 +3020,6 @@ const docTemplate = `{
                 },
                 "updated_at": {
                     "type": "string"
-                }
-            }
-        },
-        "models.ShoppingCart": {
-            "type": "object",
-            "properties": {
-                "games": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/models.Game"
-                    }
-                },
-                "id": {
-                    "type": "integer"
-                },
-                "user": {
-                    "$ref": "#/definitions/models.User"
-                },
-                "user_id": {
-                    "type": "integer"
                 }
             }
         },
