@@ -20,8 +20,8 @@ import (
 var validate = validator.New()
 
 // Signup godoc
-// @Summary Registers a new userControllers
-// @Description This endpoint allows you to register a new userControllers by providing required fields: name, second_name, email, phone_number, password, and role_id. It validates the input, hashes the password, and saves the userControllers in the database.
+// @Summary Registers a new User
+// @Description This endpoint allows you to register a new User by providing required fields: name, second_name, email, phone_number, password, and role_id. It validates the input, hashes the password, and saves the userControllers in the database. Also, it creates shoppingCart for this user
 // @Tags Users
 // @Accept json
 // @Produce json
@@ -36,6 +36,7 @@ func Signup() gin.HandlerFunc {
 		var ctx, cancel = context.WithTimeout(context.Background(), 15*time.Second)
 		defer cancel()
 		var user models.User
+		var cart models.ShoppingCart
 
 		if err := c.BindJSON(&user); err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
@@ -57,6 +58,9 @@ func Signup() gin.HandlerFunc {
 		token, refreshToken, _ := helpers.GenerateAllTokens(user.Email, user.Name, user.SecondName, user.Role.Type, user.ID)
 		user.Token = token
 		user.RefreshToken = refreshToken
+
+		cart.UserId = user.ID
+
 		// Сохранение пользователя в базу
 		if err := database.DB.WithContext(ctx).Create(&user).Error; err != nil {
 			// Проверяем нарушение уникальности
@@ -75,12 +79,17 @@ func Signup() gin.HandlerFunc {
 			return
 		}
 
+		if err := database.DB.WithContext(ctx).Create(&cart).Error; err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Cart item was not created"})
+			return
+		}
+
 		c.JSON(http.StatusCreated, gin.H{"message": "User registered successfully"})
 	}
 }
 
 // Login godoc
-// @Summary Logs in a userControllers and returns access and refresh tokens
+// @Summary Logs in a User and returns user data
 // @Description This endpoint allows the userControllers to log in by providing email and password. It checks if the userControllers exists, verifies the password, generates access and refresh tokens, updates the tokens in the database, and sets them as cookies in the response.
 // @Tags Users
 // @Accept json
@@ -134,8 +143,8 @@ func Login() gin.HandlerFunc {
 }
 
 // GetUserById godoc
-// @Summary Get a userControllers by ID
-// @Description Fetches a userControllers by their ID from the database. The userControllers making the request must be authorized to access the requested userControllers data. User can get access only to their data. Admin can get access to all users data.
+// @Summary Get a User by ID
+// @Description Fetches a Users by their ID from the database. The userControllers making the request must be authorized to access the requested user data. User can get access only to their data. Admin can get access to all users data.
 // @Tags Users
 // @Accept json
 // @Produce json
@@ -241,8 +250,8 @@ func GetAllUsers() gin.HandlerFunc {
 }
 
 // UpdateUser godoc
-// @Summary Update a userControllers's data
-// @Description Allows updating specific fields of a userControllers. The userControllers making the request must be authorized to update the specified userControllers data. User can update only their own data. Admin can update all users data.
+// @Summary Update a User data
+// @Description Allows updating specific fields of a User. The userControllers making the request must be authorized to update the specified User data. User can update only their own data excluding role. Admin can update all users data.
 // @Tags Users
 // @Accept json
 // @Produce json

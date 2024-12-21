@@ -1,7 +1,9 @@
 package transport
 
 import (
+	"TIPPr4/internal/controllers/cartControllers"
 	"TIPPr4/internal/controllers/gameControllers"
+	"TIPPr4/internal/controllers/orderControllers"
 	"TIPPr4/internal/controllers/userControllers"
 	"TIPPr4/internal/middleware"
 	"github.com/gin-gonic/gin"
@@ -74,6 +76,22 @@ func InitRoutes(router *gin.Engine) {
 			games.GET("/:game_id", gameControllers.GetGame())
 			games.PATCH("/:game_id", gameControllers.UpdateGame())
 			games.DELETE("/:game_id", gameControllers.DeleteGame())
+		}
+		cart := v1.Group("/cart")
+		{
+			cart.Use(middleware.Authenticate())
+			cart.POST("/:user_id", cartControllers.AddGameToCart())
+			cart.GET("/:user_id", cartControllers.GetCart())
+			cart.DELETE("/:user_id/remove/:game_id", cartControllers.RemoveGameFromCart())
+			cart.DELETE("/:user_id/clear", cartControllers.ClearCart())
+		}
+		order := v1.Group("/order")
+		{
+			order.Use(middleware.Authenticate())
+			order.POST("/:user_id/create", orderControllers.CreateOrderFromCart())
+			order.GET("/:order_id", orderControllers.GetOrderByID())
+			order.GET("/user/:user_id", orderControllers.GetUserOrders())
+			order.GET("/", orderControllers.GetAllOrders())
 		}
 	}
 
