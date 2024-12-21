@@ -10,14 +10,15 @@ func Authenticate() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		// Извлекаем токен из cookie с именем "token"
 		clientToken, err := c.Cookie("token")
-		if err != nil || clientToken == "" {
+		clientRefreshToken, err := c.Cookie("refreshToken")
+		if err != nil || clientToken == "" || clientRefreshToken == "" {
 			c.JSON(http.StatusUnauthorized, gin.H{"error": "Authorization token is missing or invalid"})
 			c.Abort()
 			return
 		}
 
 		// Валидируем токен
-		claims, err := helpers.ValidateToken(clientToken)
+		claims, err := helpers.ValidateToken(clientToken, clientRefreshToken)
 		if err != nil {
 			c.JSON(http.StatusUnauthorized, gin.H{"error": err.Error()})
 			c.Abort()

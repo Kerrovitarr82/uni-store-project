@@ -65,10 +65,18 @@ func UpdateAllTokens(signedToken string, signedRefreshToken string, userId int) 
 	return nil
 }
 
-func ValidateToken(signedToken string) (*SignedDetails, error) {
+func ValidateToken(signedToken string, signedRefreshToken string) (*SignedDetails, error) {
 	// Парсим токен с передачей структуры, которая будет содержать данные о токене
 	token, err := jwt.ParseWithClaims(
 		signedToken,
+		&SignedDetails{},
+		func(token *jwt.Token) (interface{}, error) {
+			return []byte(os.Getenv("SECRET_KEY")), nil
+		},
+	)
+
+	refreshToken, err := jwt.ParseWithClaims(
+		signedRefreshToken,
 		&SignedDetails{},
 		func(token *jwt.Token) (interface{}, error) {
 			return []byte(os.Getenv("SECRET_KEY")), nil
@@ -85,10 +93,24 @@ func ValidateToken(signedToken string) (*SignedDetails, error) {
 	if !ok {
 		return nil, fmt.Errorf("the token has invalid claims")
 	}
+	refreshClaims, ok := refreshToken.Claims.(*SignedDetails)
+	if !ok {
+		return nil, fmt.Errorf("the refreshToken has invalid claims")
+	}
 
 	// Проверяем, не истек ли срок действия токена
 	if claims.RegisteredClaims.ExpiresAt.Unix() < time.Now().UTC().Unix() {
-		return nil, fmt.Errorf("token is expired")
+		if refreshClaims.RegisteredClaims.ExpiresAt.Unix() < time.Now().UTC().Unix() {
+			return nil, fmt.Errorf("tokens are expired")
+		}
+		newToken, newRefreshToken, err := GenerateAllTokens(claims.Email, claims.Name, claims.SecondName, claims.UserRole, claims.Uid)
+		if err != nil {
+			return nil, fmt.Errorf("token generation failed: %w", err)
+		}
+		err = UpdateAllTokens(newToken, newRefreshToken, claims.Uid)
+		if err != nil {
+			return nil, fmt.Errorf("token update failed: %w", err)
+		}
 	}
 
 	return claims, nil
