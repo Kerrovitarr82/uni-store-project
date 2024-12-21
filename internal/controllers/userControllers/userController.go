@@ -1,4 +1,4 @@
-package controllers
+package userControllers
 
 import (
 	"TIPPr4/internal/database"
@@ -20,12 +20,12 @@ import (
 var validate = validator.New()
 
 // Signup godoc
-// @Summary Registers a new user
-// @Description This endpoint allows you to register a new user by providing required fields: name, second_name, email, phone_number, password, and role_id. It validates the input, hashes the password, and saves the user in the database.
+// @Summary Registers a new userControllers
+// @Description This endpoint allows you to register a new userControllers by providing required fields: name, second_name, email, phone_number, password, and role_id. It validates the input, hashes the password, and saves the userControllers in the database.
 // @Tags Users
 // @Accept json
 // @Produce json
-// @Param signup body dto.SignupDTO true "User data to register"
+// @Param signup body dto.UserSignupDTO true "User data to register"
 // @Success 201 {object} map[string]interface{} "User registered successfully"
 // @Failure 400 {object} map[string]interface{} "Invalid input"
 // @Failure 409 {object} map[string]interface{} "Email or phone number already in use"
@@ -80,13 +80,13 @@ func Signup() gin.HandlerFunc {
 }
 
 // Login godoc
-// @Summary Logs in a user and returns access and refresh tokens
-// @Description This endpoint allows the user to log in by providing email and password. It checks if the user exists, verifies the password, generates access and refresh tokens, updates the tokens in the database, and sets them as cookies in the response.
+// @Summary Logs in a userControllers and returns access and refresh tokens
+// @Description This endpoint allows the userControllers to log in by providing email and password. It checks if the userControllers exists, verifies the password, generates access and refresh tokens, updates the tokens in the database, and sets them as cookies in the response.
 // @Tags Users
 // @Accept json
 // @Produce json
-// @Param login body dto.LoginDTO true "User credentials (email and password)"
-// @Success 200 {object} models.User "Successfully logged in and returned user data"
+// @Param login body dto.UserLoginDTO true "User credentials (email and password)"
+// @Success 200 {object} models.User "Successfully logged in and returned userControllers data"
 // @Failure 400 {object} map[string]interface{} "Invalid input"
 // @Failure 401 {object} map[string]interface{} "Email or password is incorrect"
 // @Failure 500 {object} map[string]interface{} "Internal server error"
@@ -102,7 +102,7 @@ func Login() gin.HandlerFunc {
 			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 			return
 		}
-		err := database.DB.WithContext(ctx).First(&foundUser, "email = ?", user.Email).Error
+		err := database.DB.WithContext(ctx).Preload("Role").First(&foundUser, "email = ?", user.Email).Error
 		if err != nil {
 			c.JSON(http.StatusUnauthorized, gin.H{"error": "Email or password is incorrect"})
 			return
@@ -134,15 +134,15 @@ func Login() gin.HandlerFunc {
 }
 
 // GetUserById godoc
-// @Summary Get a user by ID
-// @Description Fetches a user by their ID from the database. The user making the request must be authorized to access the requested user data. User can get access only to their data. Admin can get access to all users data.
+// @Summary Get a userControllers by ID
+// @Description Fetches a userControllers by their ID from the database. The userControllers making the request must be authorized to access the requested userControllers data. User can get access only to their data. Admin can get access to all users data.
 // @Tags Users
 // @Accept json
 // @Produce json
 // @Param user_id path string true "User ID"
-// @Success 200 {object} models.User "Successfully retrieved the user data"
-// @Failure 400 {object} map[string]interface{} "Invalid user ID"
-// @Failure 500 {object} map[string]interface{} "Failed to fetch user"
+// @Success 200 {object} models.User "Successfully retrieved the userControllers data"
+// @Failure 400 {object} map[string]interface{} "Invalid userControllers ID"
+// @Failure 500 {object} map[string]interface{} "Failed to fetch userControllers"
 // @Router /api/v1/users/{user_id} [get]
 func GetUserById() gin.HandlerFunc {
 	return func(c *gin.Context) {
@@ -176,7 +176,7 @@ func GetUserById() gin.HandlerFunc {
 // @Failure 400 {object} map[string]interface{} "Invalid query parameters"
 // @Failure 403 {object} map[string]interface{} "Forbidden"
 // @Failure 500 {object} map[string]interface{} "Failed to fetch users"
-// @Router /api/v1/users [get]
+// @Router /api/v1/users/paginated [get]
 func GetPaginatedUsers() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		if err := helpers.CheckUserType(c, "ADMIN"); err != nil {
@@ -241,17 +241,17 @@ func GetAllUsers() gin.HandlerFunc {
 }
 
 // UpdateUser godoc
-// @Summary Update a user's data
-// @Description Allows updating specific fields of a user. The user making the request must be authorized to update the specified user data. User can update only their own data. Admin can update all users data.
+// @Summary Update a userControllers's data
+// @Description Allows updating specific fields of a userControllers. The userControllers making the request must be authorized to update the specified userControllers data. User can update only their own data. Admin can update all users data.
 // @Tags Users
 // @Accept json
 // @Produce json
 // @Param user_id path string true "User ID"
-// @Param user body models.User true "User data to update"
-// @Success 200 {object} models.User "Successfully updated the user"
+// @Param userControllers body dto.UserUpdateDTO true "User data to update"
+// @Success 200 {object} models.User "Successfully updated the userControllers"
 // @Failure 400 {object} map[string]interface{} "Invalid input"
 // @Failure 404 {object} map[string]interface{} "User not found"
-// @Failure 500 {object} map[string]interface{} "Failed to update user"
+// @Failure 500 {object} map[string]interface{} "Failed to update userControllers"
 // @Router /api/v1/users/{user_id} [patch]
 func UpdateUser() gin.HandlerFunc {
 	return func(c *gin.Context) {
@@ -281,7 +281,7 @@ func UpdateUser() gin.HandlerFunc {
 				c.JSON(http.StatusNotFound, gin.H{"error": "User not found"})
 				return
 			}
-			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to find user"})
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to find userControllers"})
 			return
 		}
 
@@ -314,7 +314,11 @@ func UpdateUser() gin.HandlerFunc {
 			user.PaymentInfo = userUpdates.PaymentInfo
 		}
 		err := helpers.CheckUserType(c, "ADMIN")
-		if err == nil && userUpdates.RoleID != 0 {
+		if err != nil {
+			c.JSON(http.StatusForbidden, gin.H{"error": err.Error()})
+			return
+		}
+		if userUpdates.RoleID != 0 {
 			user.RoleID = userUpdates.RoleID
 		}
 
@@ -323,14 +327,14 @@ func UpdateUser() gin.HandlerFunc {
 
 		// Сохраняем обновленные данные пользователя в базу данных
 		if err := database.DB.WithContext(ctx).Save(&user).Error; err != nil {
-			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to update user"})
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to update userControllers"})
 			return
 		}
 
 		// Возвращаем успешный ответ с обновленными данными
 		c.JSON(http.StatusOK, gin.H{
-			"message": "User updated successfully",
-			"user":    user,
+			"message":         "User updated successfully",
+			"userControllers": user,
 		})
 	}
 }

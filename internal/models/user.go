@@ -14,7 +14,7 @@ type User struct {
 	PhoneNumber  string         `gorm:"unique;not null" json:"phone_number" validate:"required"`
 	Password     string         `gorm:"not null" json:"password" validate:"required,min=6"`
 	PaymentInfo  string         `json:"payment_info"`
-	RoleID       int            `gorm:"not null;default:1" json:"role_id" validate:"required"`
+	RoleID       int            `gorm:"not null;default:2" json:"role_id"`
 	Role         Role           `gorm:"foreignKey:RoleID" json:"role"`
 	CreatedAt    time.Time      `json:"created_at"`
 	UpdatedAt    time.Time      `json:"updated_at"`

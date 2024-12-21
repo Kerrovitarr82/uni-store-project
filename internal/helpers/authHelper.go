@@ -3,6 +3,7 @@ package helpers
 import (
 	"errors"
 	"github.com/gin-gonic/gin"
+	"strconv"
 )
 
 func CheckUserType(c *gin.Context, role string) (err error) {
@@ -18,7 +19,7 @@ func CheckUserType(c *gin.Context, role string) (err error) {
 // Проверка уровня доступа для юзера
 func MatchUserTypeToUid(c *gin.Context, userId string) (err error) {
 	userRole := c.GetString("user_role") //берется из токена
-	uid := c.GetString("uid")            //берется из токена
+	uid := strconv.Itoa(c.GetInt("uid")) //берется из токена
 	err = nil
 
 	if userRole == "USER" && uid != userId {

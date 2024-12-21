@@ -1,4 +1,4 @@
-package controllers
+package userControllers
 
 import (
 	"TIPPr4/internal/database"

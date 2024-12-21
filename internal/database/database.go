@@ -21,10 +21,10 @@ func ConnectToDB() {
 	if err != nil {
 		log.Fatal("Failed to connect to database")
 	}
-	CheckAdmin()
+	CheckAdminAndRoles()
 }
 
-func CheckAdmin() {
+func CheckAdminAndRoles() {
 	var ctx, cancel = context.WithTimeout(context.Background(), 15*time.Second)
 	defer cancel()
 	var role models.Role
@@ -35,6 +35,17 @@ func CheckAdmin() {
 			role = models.Role{
 				Type:        "ADMIN",
 				Description: "Позволяет проводить все операции",
+				CreatedAt:   time.Now(),
+				UpdatedAt:   time.Now(),
+			}
+			DB.Create(&role)
+		}
+	}
+	if err := DB.WithContext(ctx).First(&role, "type = ?", "USER").Error; err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			role = models.Role{
+				Type:        "USER",
+				Description: "Позволяет проводить базовые операции юзера",
 				CreatedAt:   time.Now(),
 				UpdatedAt:   time.Now(),
 			}
@@ -56,8 +67,11 @@ func CheckAdmin() {
 				PhoneNumber: "none",
 				Password:    hashedPass,
 				RoleID:      1,
-				CreatedAt:   time.Now(),
-				UpdatedAt:   time.Now(),
+				Role: models.Role{
+					ID: 1,
+				},
+				CreatedAt: time.Now(),
+				UpdatedAt: time.Now(),
 			}
 			DB.Create(&user)
 		}

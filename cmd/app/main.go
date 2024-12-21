@@ -21,7 +21,7 @@ func initConfig() {
 
 // @title		Game Store
 // @version		1.0
-// @description	REST-API for game store
+// @description	REST-API for gameControllers store
 
 // @host		localhost:8080
 func main() {

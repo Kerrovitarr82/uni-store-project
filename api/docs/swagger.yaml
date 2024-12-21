@@ -1,5 +1,68 @@
 definitions:
-  dto.LoginDTO:
+  dto.CategoryDTO:
+    properties:
+      description:
+        type: string
+      name:
+        type: string
+    required:
+    - description
+    - name
+    type: object
+  dto.DeveloperDTO:
+    properties:
+      country:
+        type: string
+      description:
+        type: string
+      email:
+        type: string
+      name:
+        type: string
+    required:
+    - country
+    - description
+    - email
+    - name
+    type: object
+  dto.GameDTO:
+    properties:
+      age_restriction:
+        type: string
+      category_ids:
+        items:
+          type: integer
+        type: array
+      description:
+        type: string
+      developer_id:
+        type: integer
+      name:
+        type: string
+      price:
+        type: number
+      restrict_ids:
+        items:
+          type: integer
+        type: array
+      size:
+        type: number
+    required:
+    - developer_id
+    - name
+    - price
+    type: object
+  dto.RestrictDTO:
+    properties:
+      game_id:
+        type: integer
+      region:
+        type: string
+    required:
+    - game_id
+    - region
+    type: object
+  dto.UserLoginDTO:
     properties:
       email:
         type: string
@@ -9,7 +72,7 @@ definitions:
     - email
     - password
     type: object
-  dto.SignupDTO:
+  dto.UserSignupDTO:
     properties:
       email:
         type: string
@@ -17,6 +80,8 @@ definitions:
         type: string
       password:
         minLength: 6
+        type: string
+      phone_number:
         type: string
       second_name:
         type: string
@@ -28,19 +93,124 @@ definitions:
     - password
     - second_name
     type: object
+  dto.UserUpdateDTO:
+    properties:
+      email:
+        type: string
+      name:
+        type: string
+      password:
+        type: string
+      phone_number:
+        type: string
+      role_id:
+        type: integer
+      second_name:
+        type: string
+      third_name:
+        type: string
+    type: object
+  models.Category:
+    properties:
+      created_at:
+        type: string
+      description:
+        type: string
+      games:
+        items:
+          $ref: '#/definitions/models.Game'
+        type: array
+      id:
+        type: integer
+      name:
+        type: string
+      updated_at:
+        type: string
+    type: object
+  models.Developer:
+    properties:
+      country:
+        type: string
+      created_at:
+        type: string
+      description:
+        type: string
+      email:
+        type: string
+      games:
+        items:
+          $ref: '#/definitions/models.Game'
+        type: array
+      id:
+        type: integer
+      name:
+        type: string
+      updated_at:
+        type: string
+    type: object
+  models.Game:
+    properties:
+      age_restriction:
+        type: string
+      categories:
+        items:
+          $ref: '#/definitions/models.Category'
+        type: array
+      created_at:
+        type: string
+      description:
+        type: string
+      developer:
+        $ref: '#/definitions/models.Developer'
+      developer_id:
+        type: integer
+      id:
+        type: integer
+      name:
+        type: string
+      price:
+        type: number
+      restricts:
+        items:
+          $ref: '#/definitions/models.Restrict'
+        type: array
+      size:
+        type: number
+      updated_at:
+        type: string
+    type: object
+  models.Restrict:
+    properties:
+      game_id:
+        type: integer
+      gameControllers:
+        $ref: '#/definitions/models.Game'
+      id:
+        type: integer
+      region:
+        type: string
+    type: object
   models.Role:
     properties:
+      created_at:
+        type: string
       description:
         type: string
       id:
         type: integer
       type:
         type: string
+      updated_at:
+        type: string
     type: object
   models.User:
     properties:
+      created_at:
+        type: string
       email:
         type: string
+      id:
+        type: integer
       name:
         maxLength: 100
         minLength: 2
@@ -48,8 +218,14 @@ definitions:
       password:
         minLength: 6
         type: string
+      payment_info:
+        type: string
       phone_number:
         type: string
+      refresh_token:
+        type: string
+      role:
+        $ref: '#/definitions/models.Role'
       role_id:
         type: integer
       second_name:
@@ -58,18 +234,21 @@ definitions:
         type: string
       third_name:
         type: string
+      token:
+        type: string
+      updated_at:
+        type: string
     required:
     - email
     - name
     - password
     - phone_number
-    - role_id
     - second_name
     type: object
 host: localhost:8080
 info:
   contact: {}
-  description: REST-API for game store
+  description: REST-API for gameControllers store
   title: Game Store
   version: "1.0"
 paths:
@@ -77,22 +256,22 @@ paths:
     post:
       consumes:
       - application/json
-      description: This endpoint allows the user to log in by providing email and
-        password. It checks if the user exists, verifies the password, generates access
-        and refresh tokens, updates the tokens in the database, and sets them as cookies
-        in the response.
+      description: This endpoint allows the userControllers to log in by providing
+        email and password. It checks if the userControllers exists, verifies the
+        password, generates access and refresh tokens, updates the tokens in the database,
+        and sets them as cookies in the response.
       parameters:
       - description: User credentials (email and password)
         in: body
         name: login
         required: true
         schema:
-          $ref: '#/definitions/dto.LoginDTO'
+          $ref: '#/definitions/dto.UserLoginDTO'
       produces:
       - application/json
       responses:
         "200":
-          description: Successfully logged in and returned user data
+          description: Successfully logged in and returned userControllers data
           schema:
             $ref: '#/definitions/models.User'
         "400":
@@ -110,23 +289,24 @@ paths:
           schema:
             additionalProperties: true
             type: object
-      summary: Logs in a user and returns access and refresh tokens
+      summary: Logs in a userControllers and returns access and refresh tokens
       tags:
       - Users
   /api/v1/auth/signup:
     post:
       consumes:
       - application/json
-      description: 'This endpoint allows you to register a new user by providing required
-        fields: name, second_name, email, phone_number, password, and role_id. It
-        validates the input, hashes the password, and saves the user in the database.'
+      description: 'This endpoint allows you to register a new userControllers by
+        providing required fields: name, second_name, email, phone_number, password,
+        and role_id. It validates the input, hashes the password, and saves the userControllers
+        in the database.'
       parameters:
       - description: User data to register
         in: body
         name: signup
         required: true
         schema:
-          $ref: '#/definitions/dto.SignupDTO'
+          $ref: '#/definitions/dto.UserSignupDTO'
       produces:
       - application/json
       responses:
@@ -150,9 +330,757 @@ paths:
           schema:
             additionalProperties: true
             type: object
-      summary: Registers a new user
+      summary: Registers a new userControllers
       tags:
       - Users
+  /api/v1/categories:
+    get:
+      consumes:
+      - application/json
+      description: Get all categories
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.Category'
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Get All Categories
+      tags:
+      - Category
+    post:
+      consumes:
+      - application/json
+      description: Create a new category
+      parameters:
+      - description: Category Data
+        in: body
+        name: category
+        required: true
+        schema:
+          $ref: '#/definitions/dto.CategoryDTO'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/models.Category'
+        "400":
+          description: Validation Error
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Create Category
+      tags:
+      - Category
+  /api/v1/categories/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete a category by ID
+      parameters:
+      - description: Category ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: No Content
+          schema:
+            type: string
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: Category Not Found
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Delete Category
+      tags:
+      - Category
+    get:
+      consumes:
+      - application/json
+      description: Get a category by ID
+      parameters:
+      - description: Category ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Category'
+        "404":
+          description: Category Not Found
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Get Category
+      tags:
+      - Category
+    patch:
+      consumes:
+      - application/json
+      description: Update a category
+      parameters:
+      - description: Category ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Category Data
+        in: body
+        name: category
+        required: true
+        schema:
+          $ref: '#/definitions/dto.CategoryDTO'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Category'
+        "400":
+          description: Validation Error
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: Category Not Found
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Update Category
+      tags:
+      - Category
+  /api/v1/categories/paginated:
+    get:
+      consumes:
+      - application/json
+      description: Get categories with pagination
+      parameters:
+      - description: Page number
+        in: query
+        name: page
+        required: true
+        type: integer
+      - description: Page size
+        in: query
+        name: limit
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Paginated Categories
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Get Paginated Categories
+      tags:
+      - Category
+  /api/v1/developers:
+    get:
+      consumes:
+      - application/json
+      description: Get all developers
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.Developer'
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Get All Developers
+      tags:
+      - Developer
+    post:
+      consumes:
+      - application/json
+      description: Create a new developer
+      parameters:
+      - description: Developer Data
+        in: body
+        name: developer
+        required: true
+        schema:
+          $ref: '#/definitions/dto.DeveloperDTO'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/models.Developer'
+        "400":
+          description: Validation Error
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Create Developer
+      tags:
+      - Developer
+  /api/v1/developers/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete a developer by ID
+      parameters:
+      - description: Developer ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: No Content
+          schema:
+            type: string
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: Developer Not Found
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Delete Developer
+      tags:
+      - Developer
+    get:
+      consumes:
+      - application/json
+      description: Get a developer by ID
+      parameters:
+      - description: Developer ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Developer'
+        "404":
+          description: Developer Not Found
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Get Developer
+      tags:
+      - Developer
+    patch:
+      consumes:
+      - application/json
+      description: Update a developer
+      parameters:
+      - description: Developer ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Developer Data
+        in: body
+        name: developer
+        required: true
+        schema:
+          $ref: '#/definitions/dto.DeveloperDTO'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Developer'
+        "400":
+          description: Validation Error
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: Developer Not Found
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Update Developer
+      tags:
+      - Developer
+  /api/v1/developers/paginated:
+    get:
+      consumes:
+      - application/json
+      description: Get developers with pagination
+      parameters:
+      - description: Page number
+        in: query
+        name: page
+        required: true
+        type: integer
+      - description: Page size
+        in: query
+        name: limit
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Paginated Developers
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Get Paginated Developers
+      tags:
+      - Developer
+  /api/v1/games:
+    get:
+      consumes:
+      - application/json
+      description: Get all games
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.Game'
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Get All Games
+      tags:
+      - Game
+    post:
+      consumes:
+      - application/json
+      description: Create a new gameControllers
+      parameters:
+      - description: Game Data
+        in: body
+        name: gameControllers
+        required: true
+        schema:
+          $ref: '#/definitions/dto.GameDTO'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/models.Game'
+        "400":
+          description: Validation Error
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Create Game
+      tags:
+      - Game
+  /api/v1/games/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete a gameControllers by ID
+      parameters:
+      - description: Game ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: No Content
+          schema:
+            type: string
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: Game Not Found
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Delete Game
+      tags:
+      - Game
+    get:
+      consumes:
+      - application/json
+      description: Get a gameControllers by ID
+      parameters:
+      - description: Game ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Game'
+        "404":
+          description: Game Not Found
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Get Game
+      tags:
+      - Game
+    patch:
+      consumes:
+      - application/json
+      description: Update a gameControllers
+      parameters:
+      - description: Game ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Game Data
+        in: body
+        name: gameControllers
+        required: true
+        schema:
+          $ref: '#/definitions/dto.GameDTO'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Game'
+        "400":
+          description: Validation Error
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: Game Not Found
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Update Game
+      tags:
+      - Game
+  /api/v1/games/paginated:
+    get:
+      consumes:
+      - application/json
+      description: Get games with pagination
+      parameters:
+      - description: Page number
+        in: query
+        name: page
+        required: true
+        type: integer
+      - description: Page size
+        in: query
+        name: limit
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Paginated Games
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Get Paginated Games
+      tags:
+      - Game
+  /api/v1/restricts:
+    get:
+      consumes:
+      - application/json
+      description: Get all restricts
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.Restrict'
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Get All Restricts
+      tags:
+      - Restrict
+    post:
+      consumes:
+      - application/json
+      description: Create a new restrict entry
+      parameters:
+      - description: Restrict Data
+        in: body
+        name: restrict
+        required: true
+        schema:
+          $ref: '#/definitions/dto.RestrictDTO'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/models.Restrict'
+        "400":
+          description: Validation Error
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Create Restrict
+      tags:
+      - Restrict
+  /api/v1/restricts/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete a restrict entry by ID
+      parameters:
+      - description: Restrict ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: No Content
+          schema:
+            type: string
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: Restrict Not Found
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Delete Restrict
+      tags:
+      - Restrict
+    get:
+      consumes:
+      - application/json
+      description: Get a restrict entry by ID
+      parameters:
+      - description: Restrict ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Restrict'
+        "404":
+          description: Restrict Not Found
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Get Restrict
+      tags:
+      - Restrict
+    patch:
+      consumes:
+      - application/json
+      description: Update a restrict entry
+      parameters:
+      - description: Restrict ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Restrict Data
+        in: body
+        name: restrict
+        required: true
+        schema:
+          $ref: '#/definitions/dto.RestrictDTO'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Restrict'
+        "400":
+          description: Validation Error
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: Restrict Not Found
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Update Restrict
+      tags:
+      - Restrict
+  /api/v1/restricts/paginated:
+    get:
+      consumes:
+      - application/json
+      description: Get restricts with pagination
+      parameters:
+      - description: Page number
+        in: query
+        name: page
+        required: true
+        type: integer
+      - description: Page size
+        in: query
+        name: limit
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Paginated Restricts
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Get Paginated Restricts
+      tags:
+      - Restrict
   /api/v1/roles:
     get:
       description: This endpoint allows an admin to fetch all roles.
@@ -362,9 +1290,10 @@ paths:
     get:
       consumes:
       - application/json
-      description: Fetches a user by their ID from the database. The user making the
-        request must be authorized to access the requested user data. User can get
-        access only to their data. Admin can get access to all users data.
+      description: Fetches a userControllers by their ID from the database. The userControllers
+        making the request must be authorized to access the requested userControllers
+        data. User can get access only to their data. Admin can get access to all
+        users data.
       parameters:
       - description: User ID
         in: path
@@ -375,28 +1304,28 @@ paths:
       - application/json
       responses:
         "200":
-          description: Successfully retrieved the user data
+          description: Successfully retrieved the userControllers data
           schema:
             $ref: '#/definitions/models.User'
         "400":
-          description: Invalid user ID
+          description: Invalid userControllers ID
           schema:
             additionalProperties: true
             type: object
         "500":
-          description: Failed to fetch user
+          description: Failed to fetch userControllers
           schema:
             additionalProperties: true
             type: object
-      summary: Get a user by ID
+      summary: Get a userControllers by ID
       tags:
       - Users
     patch:
       consumes:
       - application/json
-      description: Allows updating specific fields of a user. The user making the
-        request must be authorized to update the specified user data. User can update
-        only their own data. Admin can update all users data.
+      description: Allows updating specific fields of a userControllers. The userControllers
+        making the request must be authorized to update the specified userControllers
+        data. User can update only their own data. Admin can update all users data.
       parameters:
       - description: User ID
         in: path
@@ -405,15 +1334,15 @@ paths:
         type: string
       - description: User data to update
         in: body
-        name: user
+        name: userControllers
         required: true
         schema:
-          $ref: '#/definitions/models.User'
+          $ref: '#/definitions/dto.UserUpdateDTO'
       produces:
       - application/json
       responses:
         "200":
-          description: Successfully updated the user
+          description: Successfully updated the userControllers
           schema:
             $ref: '#/definitions/models.User'
         "400":
@@ -427,11 +1356,55 @@ paths:
             additionalProperties: true
             type: object
         "500":
-          description: Failed to update user
+          description: Failed to update userControllers
           schema:
             additionalProperties: true
             type: object
-      summary: Update a user's data
+      summary: Update a userControllers's data
+      tags:
+      - Users
+  /api/v1/users/paginated:
+    get:
+      consumes:
+      - application/json
+      description: Fetches a paginated list of users from the database. Only admins
+        can access this endpoint.
+      parameters:
+      - default: 10
+        description: Limit number of results
+        in: query
+        name: limit
+        type: integer
+      - default: 0
+        description: Offset for pagination
+        in: query
+        name: offset
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Successfully retrieved the paginated users
+          schema:
+            items:
+              $ref: '#/definitions/models.User'
+            type: array
+        "400":
+          description: Invalid query parameters
+          schema:
+            additionalProperties: true
+            type: object
+        "403":
+          description: Forbidden
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Failed to fetch users
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Get users with pagination
       tags:
       - Users
 swagger: "2.0"
