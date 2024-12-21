@@ -59,8 +59,6 @@ func Signup() gin.HandlerFunc {
 		user.Token = token
 		user.RefreshToken = refreshToken
 
-		cart.UserId = user.ID
-
 		// Сохранение пользователя в базу
 		if err := database.DB.WithContext(ctx).Create(&user).Error; err != nil {
 			// Проверяем нарушение уникальности
@@ -78,6 +76,8 @@ func Signup() gin.HandlerFunc {
 			}
 			return
 		}
+
+		cart.User = user
 
 		if err := database.DB.WithContext(ctx).Create(&cart).Error; err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": "Cart item was not created"})
@@ -164,7 +164,7 @@ func GetUserById() gin.HandlerFunc {
 		var ctx, cancel = context.WithTimeout(context.Background(), 100*time.Second)
 
 		var user models.User
-		err := database.DB.WithContext(ctx).First(&user, userId).Error
+		err := database.DB.WithContext(ctx).Preload("Role").First(&user, userId).Error
 		defer cancel()
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
@@ -208,7 +208,7 @@ func GetPaginatedUsers() gin.HandlerFunc {
 			return
 		}
 
-		query := database.DB.WithContext(ctx).Limit(limit).Offset(offset)
+		query := database.DB.WithContext(ctx).Preload("Role").Limit(limit).Offset(offset)
 		if err := query.Find(&users).Error; err != nil {
 			log.Printf("Error fetching users: %v", err)
 			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch users"})
@@ -239,7 +239,7 @@ func GetAllUsers() gin.HandlerFunc {
 		defer cancel()
 		var users []models.User
 
-		err := database.DB.WithContext(ctx).Find(&users).Error
+		err := database.DB.WithContext(ctx).Preload("Role").Find(&users).Error
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch users"})
 			return
@@ -251,16 +251,16 @@ func GetAllUsers() gin.HandlerFunc {
 
 // UpdateUser godoc
 // @Summary Update a User data
-// @Description Allows updating specific fields of a User. The userControllers making the request must be authorized to update the specified User data. User can update only their own data excluding role. Admin can update all users data.
+// @Description Allows updating specific fields of a User. The User making the request must be authorized to update the specified User data. User can update only their own data excluding role. Admin can update all users data.
 // @Tags Users
 // @Accept json
 // @Produce json
 // @Param user_id path string true "User ID"
-// @Param userControllers body dto.UserUpdateDTO true "User data to update"
-// @Success 200 {object} models.User "Successfully updated the userControllers"
+// @Param user body dto.UserUpdateDTO true "User data to update"
+// @Success 200 {object} models.User "Successfully updated the user"
 // @Failure 400 {object} map[string]interface{} "Invalid input"
 // @Failure 404 {object} map[string]interface{} "User not found"
-// @Failure 500 {object} map[string]interface{} "Failed to update userControllers"
+// @Failure 500 {object} map[string]interface{} "Failed to update user"
 // @Router /api/v1/users/{user_id} [patch]
 func UpdateUser() gin.HandlerFunc {
 	return func(c *gin.Context) {
@@ -290,7 +290,7 @@ func UpdateUser() gin.HandlerFunc {
 				c.JSON(http.StatusNotFound, gin.H{"error": "User not found"})
 				return
 			}
-			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to find userControllers"})
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to find user"})
 			return
 		}
 
@@ -336,14 +336,14 @@ func UpdateUser() gin.HandlerFunc {
 
 		// Сохраняем обновленные данные пользователя в базу данных
 		if err := database.DB.WithContext(ctx).Save(&user).Error; err != nil {
-			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to update userControllers"})
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to update user"})
 			return
 		}
 
 		// Возвращаем успешный ответ с обновленными данными
 		c.JSON(http.StatusOK, gin.H{
-			"message":         "User updated successfully",
-			"userControllers": user,
+			"message": "User updated successfully",
+			"user":    user,
 		})
 	}
 }

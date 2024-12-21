@@ -2,6 +2,7 @@ package orderControllers
 
 import (
 	"TIPPr4/internal/database"
+	"TIPPr4/internal/dto"
 	"TIPPr4/internal/helpers"
 	"TIPPr4/internal/models"
 	"context"
@@ -20,7 +21,7 @@ import (
 // @Accept json
 // @Produce json
 // @Param user_id path int true "User ID"
-// @Success 200 {object} models.Order
+// @Success 200 {object} dto.OrderDTO
 // @Failure 404 {object} map[string]interface{}
 // @Failure 500 {object} map[string]interface{}
 // @Router /api/v1/orders/{user_id}/create [post]
@@ -86,7 +87,22 @@ func CreateOrderFromCart() gin.HandlerFunc {
 			return
 		}
 
-		c.JSON(http.StatusOK, order)
+		if err := database.DB.WithContext(ctx).
+			Preload("Games.Developer").Preload("Games.Categories").Preload("Games.Restricts").Preload("Games").
+			First(&order, order.ID).Error; err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+			return
+		}
+
+		respOrder := dto.OrderDTO{
+			ID:        order.ID,
+			UserID:    order.UserID,
+			Games:     order.Games,
+			TotalCost: order.TotalCost,
+			CreatedAt: order.CreatedAt,
+		}
+
+		c.JSON(http.StatusOK, respOrder)
 	}
 }
 
@@ -97,7 +113,7 @@ func CreateOrderFromCart() gin.HandlerFunc {
 // @Accept json
 // @Produce json
 // @Param order_id path int true "Order ID"
-// @Success 200 {object} models.Order
+// @Success 200 {object} dto.OrderDTO
 // @Failure 404 {object} map[string]interface{}
 // @Failure 500 {object} map[string]interface{}
 // @Router /api/v1/orders/{order_id} [get]
@@ -110,7 +126,9 @@ func GetOrderByID() gin.HandlerFunc {
 		defer cancel()
 
 		var order models.Order
-		if err := database.DB.WithContext(ctx).Preload("Games").First(&order, orderID).Error; err != nil {
+		if err := database.DB.WithContext(ctx).
+			Preload("Games.Developer").Preload("Games.Categories").Preload("Games.Restricts").Preload("Games").
+			First(&order, orderID).Error; err != nil {
 			if errors.Is(err, gorm.ErrRecordNotFound) {
 				c.JSON(http.StatusNotFound, gin.H{"error": "Order not found"})
 				return
@@ -123,7 +141,15 @@ func GetOrderByID() gin.HandlerFunc {
 			return
 		}
 
-		c.JSON(http.StatusOK, order)
+		respOrder := dto.OrderDTO{
+			ID:        order.ID,
+			UserID:    order.UserID,
+			Games:     order.Games,
+			TotalCost: order.TotalCost,
+			CreatedAt: order.CreatedAt,
+		}
+
+		c.JSON(http.StatusOK, respOrder)
 	}
 }
 
@@ -134,7 +160,7 @@ func GetOrderByID() gin.HandlerFunc {
 // @Accept json
 // @Produce json
 // @Param user_id path int true "User ID"
-// @Success 200 {array} models.Order
+// @Success 200 {array} dto.OrderDTO
 // @Failure 404 {object} map[string]interface{}
 // @Failure 500 {object} map[string]interface{}
 // @Router /api/v1/orders/user/{user_id} [get]
@@ -151,12 +177,27 @@ func GetUserOrders() gin.HandlerFunc {
 		defer cancel()
 
 		var orders []models.Order
-		if err := database.DB.WithContext(ctx).Preload("Games").Where("user_id = ?", userID).Find(&orders).Error; err != nil {
+		if err := database.DB.WithContext(ctx).
+			Preload("Games.Developer").Preload("Games.Categories").Preload("Games.Restricts").Preload("Games").
+			Where("user_id = ?", userID).Find(&orders).Error; err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 			return
 		}
 
-		c.JSON(http.StatusOK, orders)
+		var respOrders []dto.OrderDTO
+
+		for _, order := range orders {
+			respOrder := dto.OrderDTO{
+				ID:        order.ID,
+				UserID:    order.UserID,
+				Games:     order.Games,
+				TotalCost: order.TotalCost,
+				CreatedAt: order.CreatedAt,
+			}
+			respOrders = append(respOrders, respOrder)
+		}
+
+		c.JSON(http.StatusOK, respOrders)
 	}
 }
 
@@ -166,7 +207,7 @@ func GetUserOrders() gin.HandlerFunc {
 // @Tags Orders
 // @Accept json
 // @Produce json
-// @Success 200 {array} models.Order
+// @Success 200 {array} dto.OrderDTO
 // @Failure 500 {object} map[string]interface{}
 // @Router /api/v1/orders [get]
 func GetAllOrders() gin.HandlerFunc {
@@ -186,6 +227,19 @@ func GetAllOrders() gin.HandlerFunc {
 			return
 		}
 
-		c.JSON(http.StatusOK, orders)
+		var respOrders []dto.OrderDTO
+
+		for _, order := range orders {
+			respOrder := dto.OrderDTO{
+				ID:        order.ID,
+				UserID:    order.UserID,
+				Games:     order.Games,
+				TotalCost: order.TotalCost,
+				CreatedAt: order.CreatedAt,
+			}
+			respOrders = append(respOrders, respOrder)
+		}
+
+		c.JSON(http.StatusOK, respOrders)
 	}
 }

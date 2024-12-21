@@ -46,6 +46,5 @@ type Category struct {
 type Restrict struct {
 	ID     int    `gorm:"primaryKey" json:"id"`
 	GameID int    `gorm:"not null" json:"game_id"`
-	Game   Game   `gorm:"foreignKey:GameID" json:"gameControllers"`
 	Region string `gorm:"not null" json:"region"`
 }

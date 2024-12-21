@@ -80,18 +80,18 @@ func InitRoutes(router *gin.Engine) {
 		cart := v1.Group("/cart")
 		{
 			cart.Use(middleware.Authenticate())
-			cart.POST("/:user_id", cartControllers.AddGameToCart())
+			cart.POST("/:user_id/add/:game_id", cartControllers.AddGameToCart())
 			cart.GET("/:user_id", cartControllers.GetCart())
 			cart.DELETE("/:user_id/remove/:game_id", cartControllers.RemoveGameFromCart())
 			cart.DELETE("/:user_id/clear", cartControllers.ClearCart())
 		}
-		order := v1.Group("/order")
+		orders := v1.Group("/orders")
 		{
-			order.Use(middleware.Authenticate())
-			order.POST("/:user_id/create", orderControllers.CreateOrderFromCart())
-			order.GET("/:order_id", orderControllers.GetOrderByID())
-			order.GET("/user/:user_id", orderControllers.GetUserOrders())
-			order.GET("/", orderControllers.GetAllOrders())
+			orders.Use(middleware.Authenticate())
+			orders.POST("/:user_id/create", orderControllers.CreateOrderFromCart())
+			orders.GET("/:order_id", orderControllers.GetOrderByID())
+			orders.GET("/user/:user_id", orderControllers.GetUserOrders())
+			orders.GET("/", orderControllers.GetAllOrders())
 		}
 	}
 

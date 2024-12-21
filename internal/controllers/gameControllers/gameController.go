@@ -108,7 +108,7 @@ func GetGame() gin.HandlerFunc {
 func GetAllGames() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var games []models.Game
-		if err := database.DB.Preload("Developer").Preload("Categories").Find(&games).Error; err != nil {
+		if err := database.DB.Preload("Developer").Preload("Categories").Preload("Restricts").Find(&games).Error; err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 			return
 		}
@@ -141,7 +141,7 @@ func GetPaginatedGames() gin.HandlerFunc {
 			return
 		}
 
-		if err := database.DB.Preload("Developer").Preload("Categories").Limit(limit).Offset(offset).Find(&games).Error; err != nil {
+		if err := database.DB.Preload("Developer").Preload("Categories").Preload("Restricts").Limit(limit).Offset(offset).Find(&games).Error; err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 			return
 		}

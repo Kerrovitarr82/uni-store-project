@@ -67,7 +67,7 @@ func GetRestrict() gin.HandlerFunc {
 		var restrict models.Restrict
 		id := c.Param("restrict_id")
 
-		if err := database.DB.Preload("Game").First(&restrict, id).Error; err != nil {
+		if err := database.DB.First(&restrict, id).Error; err != nil {
 			if errors.Is(err, gorm.ErrRecordNotFound) {
 				c.JSON(http.StatusNotFound, gin.H{"error": "Restrict not found"})
 				return
@@ -92,7 +92,7 @@ func GetRestrict() gin.HandlerFunc {
 func GetAllRestricts() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var restricts []models.Restrict
-		if err := database.DB.Preload("Game").Find(&restricts).Error; err != nil {
+		if err := database.DB.Find(&restricts).Error; err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 			return
 		}
@@ -125,7 +125,7 @@ func GetPaginatedRestricts() gin.HandlerFunc {
 			return
 		}
 
-		if err := database.DB.Preload("Game").Limit(limit).Offset(offset).Find(&restricts).Error; err != nil {
+		if err := database.DB.Limit(limit).Offset(offset).Find(&restricts).Error; err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 			return
 		}

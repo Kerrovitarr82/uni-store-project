@@ -170,7 +170,7 @@ func GetCart() gin.HandlerFunc {
 		}
 
 		var cart models.ShoppingCart
-		if err := database.DB.WithContext(ctx).Preload("Games").Where("user_id = ?", userID).First(&cart).Error; err != nil {
+		if err := database.DB.WithContext(ctx).Preload("User").Preload("Games").Where("user_id = ?", userID).First(&cart).Error; err != nil {
 			if errors.Is(err, gorm.ErrRecordNotFound) {
 				c.JSON(http.StatusNotFound, gin.H{"error": "Shopping cart not found"})
 				return
@@ -206,7 +206,7 @@ func ClearCart() gin.HandlerFunc {
 		}
 
 		var cart models.ShoppingCart
-		if err := database.DB.WithContext(ctx).Preload("Games").Where("user_id = ?", userID).First(&cart).Error; err != nil {
+		if err := database.DB.WithContext(ctx).Where("user_id = ?", userID).First(&cart).Error; err != nil {
 			if errors.Is(err, gorm.ErrRecordNotFound) {
 				c.JSON(http.StatusNotFound, gin.H{"error": "Shopping cart not found"})
 				return

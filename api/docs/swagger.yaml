@@ -52,6 +52,21 @@ definitions:
     - name
     - price
     type: object
+  dto.OrderDTO:
+    properties:
+      created_at:
+        type: string
+      games:
+        items:
+          $ref: '#/definitions/models.Game'
+        type: array
+      id:
+        type: integer
+      total_cost:
+        type: number
+      user_id:
+        type: integer
+    type: object
   dto.RestrictDTO:
     properties:
       game_id:
@@ -183,8 +198,6 @@ definitions:
     properties:
       game_id:
         type: integer
-      gameControllers:
-        $ref: '#/definitions/models.Game'
       id:
         type: integer
       region:
@@ -202,6 +215,19 @@ definitions:
         type: string
       updated_at:
         type: string
+    type: object
+  models.ShoppingCart:
+    properties:
+      games:
+        items:
+          $ref: '#/definitions/models.Game'
+        type: array
+      id:
+        type: integer
+      user:
+        $ref: '#/definitions/models.User'
+      user_id:
+        type: integer
     type: object
   models.User:
     properties:
@@ -289,17 +315,17 @@ paths:
           schema:
             additionalProperties: true
             type: object
-      summary: Logs in a userControllers and returns access and refresh tokens
+      summary: Logs in a User and returns user data
       tags:
       - Users
   /api/v1/auth/signup:
     post:
       consumes:
       - application/json
-      description: 'This endpoint allows you to register a new userControllers by
-        providing required fields: name, second_name, email, phone_number, password,
-        and role_id. It validates the input, hashes the password, and saves the userControllers
-        in the database.'
+      description: 'This endpoint allows you to register a new User by providing required
+        fields: name, second_name, email, phone_number, password, and role_id. It
+        validates the input, hashes the password, and saves the userControllers in
+        the database. Also, it creates shoppingCart for this user'
       parameters:
       - description: User data to register
         in: body
@@ -330,9 +356,156 @@ paths:
           schema:
             additionalProperties: true
             type: object
-      summary: Registers a new userControllers
+      summary: Registers a new User
       tags:
       - Users
+  /api/v1/cart/{user_id}:
+    get:
+      consumes:
+      - application/json
+      description: Get the user's shopping cart contents
+      parameters:
+      - description: User ID
+        in: path
+        name: user_id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.ShoppingCart'
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Get Shopping Cart
+      tags:
+      - ShoppingCart
+  /api/v1/cart/{user_id}/add/{game_id}:
+    post:
+      consumes:
+      - application/json
+      description: Add a specific game to the user's shopping cart
+      parameters:
+      - description: User ID
+        in: path
+        name: user_id
+        required: true
+        type: integer
+      - description: Game ID
+        in: path
+        name: game_id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Add Game to Shopping Cart
+      tags:
+      - ShoppingCart
+  /api/v1/cart/{user_id}/clear:
+    delete:
+      consumes:
+      - application/json
+      description: Clear all games from the user's shopping cart
+      parameters:
+      - description: User ID
+        in: path
+        name: user_id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Clear Shopping Cart
+      tags:
+      - ShoppingCart
+  /api/v1/cart/{user_id}/remove/{game_id}:
+    delete:
+      consumes:
+      - application/json
+      description: Remove a specific game from the user's shopping cart
+      parameters:
+      - description: User ID
+        in: path
+        name: user_id
+        required: true
+        type: integer
+      - description: Game ID
+        in: path
+        name: game_id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Remove Game from Shopping Cart
+      tags:
+      - ShoppingCart
   /api/v1/categories:
     get:
       consumes:
@@ -894,6 +1067,123 @@ paths:
       summary: Get Paginated Games
       tags:
       - Game
+  /api/v1/orders:
+    get:
+      consumes:
+      - application/json
+      description: Get a list of all orders in the system
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/dto.OrderDTO'
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Get All Orders
+      tags:
+      - Orders
+  /api/v1/orders/{order_id}:
+    get:
+      consumes:
+      - application/json
+      description: Get the details of a specific order by ID
+      parameters:
+      - description: Order ID
+        in: path
+        name: order_id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.OrderDTO'
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Get Order by ID
+      tags:
+      - Orders
+  /api/v1/orders/{user_id}/create:
+    post:
+      consumes:
+      - application/json
+      description: Create a new order using the contents of the user's shopping cart
+      parameters:
+      - description: User ID
+        in: path
+        name: user_id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.OrderDTO'
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Create Order from Shopping Cart
+      tags:
+      - Orders
+  /api/v1/orders/user/{user_id}:
+    get:
+      consumes:
+      - application/json
+      description: Get all orders of a specific user
+      parameters:
+      - description: User ID
+        in: path
+        name: user_id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/dto.OrderDTO'
+            type: array
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Get User's Orders
+      tags:
+      - Orders
   /api/v1/restricts:
     get:
       consumes:
@@ -1290,10 +1580,9 @@ paths:
     get:
       consumes:
       - application/json
-      description: Fetches a userControllers by their ID from the database. The userControllers
-        making the request must be authorized to access the requested userControllers
-        data. User can get access only to their data. Admin can get access to all
-        users data.
+      description: Fetches a Users by their ID from the database. The userControllers
+        making the request must be authorized to access the requested user data. User
+        can get access only to their data. Admin can get access to all users data.
       parameters:
       - description: User ID
         in: path
@@ -1317,15 +1606,15 @@ paths:
           schema:
             additionalProperties: true
             type: object
-      summary: Get a userControllers by ID
+      summary: Get a User by ID
       tags:
       - Users
     patch:
       consumes:
       - application/json
-      description: Allows updating specific fields of a userControllers. The userControllers
-        making the request must be authorized to update the specified userControllers
-        data. User can update only their own data. Admin can update all users data.
+      description: Allows updating specific fields of a User. The User making the
+        request must be authorized to update the specified User data. User can update
+        only their own data excluding role. Admin can update all users data.
       parameters:
       - description: User ID
         in: path
@@ -1334,7 +1623,7 @@ paths:
         type: string
       - description: User data to update
         in: body
-        name: userControllers
+        name: user
         required: true
         schema:
           $ref: '#/definitions/dto.UserUpdateDTO'
@@ -1342,7 +1631,7 @@ paths:
       - application/json
       responses:
         "200":
-          description: Successfully updated the userControllers
+          description: Successfully updated the user
           schema:
             $ref: '#/definitions/models.User'
         "400":
@@ -1356,11 +1645,11 @@ paths:
             additionalProperties: true
             type: object
         "500":
-          description: Failed to update userControllers
+          description: Failed to update user
           schema:
             additionalProperties: true
             type: object
-      summary: Update a userControllers's data
+      summary: Update a User data
       tags:
       - Users
   /api/v1/users/paginated:
