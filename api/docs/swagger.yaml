@@ -77,6 +77,15 @@ definitions:
     - game_id
     - region
     type: object
+  dto.ReviewDTO:
+    properties:
+      description:
+        type: string
+      rating:
+        type: integer
+      title:
+        type: string
+    type: object
   dto.UserLoginDTO:
     properties:
       email:
@@ -163,6 +172,19 @@ definitions:
       updated_at:
         type: string
     type: object
+  models.Favorite:
+    properties:
+      games:
+        items:
+          $ref: '#/definitions/models.Game'
+        type: array
+      id:
+        type: integer
+      user_id:
+        type: integer
+      userControllers:
+        $ref: '#/definitions/models.User'
+    type: object
   models.Game:
     properties:
       age_restriction:
@@ -194,6 +216,23 @@ definitions:
       updated_at:
         type: string
     type: object
+  models.Library:
+    properties:
+      created_at:
+        type: string
+      games:
+        items:
+          $ref: '#/definitions/models.Game'
+        type: array
+      id:
+        type: integer
+      updated_at:
+        type: string
+      user_id:
+        type: integer
+      userControllers:
+        $ref: '#/definitions/models.User'
+    type: object
   models.Restrict:
     properties:
       game_id:
@@ -202,6 +241,29 @@ definitions:
         type: integer
       region:
         type: string
+    type: object
+  models.Review:
+    properties:
+      created_at:
+        type: string
+      description:
+        type: string
+      game:
+        $ref: '#/definitions/models.Game'
+      game_id:
+        type: integer
+      id:
+        type: integer
+      rating:
+        type: integer
+      title:
+        type: string
+      updated_at:
+        type: string
+      user:
+        $ref: '#/definitions/models.User'
+      user_id:
+        type: integer
     type: object
   models.Role:
     properties:
@@ -880,6 +942,153 @@ paths:
       summary: Get Paginated Developers
       tags:
       - Developer
+  /api/v1/favorite/{user_id}:
+    get:
+      consumes:
+      - application/json
+      description: Get the user's favorite contents
+      parameters:
+      - description: User ID
+        in: path
+        name: user_id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Favorite'
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Get favorite
+      tags:
+      - Favorite
+  /api/v1/favorite/{user_id}/add/{game_id}:
+    post:
+      consumes:
+      - application/json
+      description: Add a specific game to the user's favorite
+      parameters:
+      - description: User ID
+        in: path
+        name: user_id
+        required: true
+        type: integer
+      - description: Game ID
+        in: path
+        name: game_id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Add Game to favorite
+      tags:
+      - Favorite
+  /api/v1/favorite/{user_id}/clear:
+    delete:
+      consumes:
+      - application/json
+      description: Clear all games from the user's favorite
+      parameters:
+      - description: User ID
+        in: path
+        name: user_id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Clear favorite
+      tags:
+      - Favorite
+  /api/v1/favorite/{user_id}/remove/{game_id}:
+    delete:
+      consumes:
+      - application/json
+      description: Remove a specific game from the user's favorite
+      parameters:
+      - description: User ID
+        in: path
+        name: user_id
+        required: true
+        type: integer
+      - description: Game ID
+        in: path
+        name: game_id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Remove Game from favorite
+      tags:
+      - Favorite
   /api/v1/games:
     get:
       consumes:
@@ -1067,6 +1276,37 @@ paths:
       summary: Get Paginated Games
       tags:
       - Game
+  /api/v1/library/{user_id}:
+    get:
+      consumes:
+      - application/json
+      description: Get the user's library
+      parameters:
+      - description: User ID
+        in: path
+        name: user_id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Library'
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Get favorite
+      tags:
+      - Library
   /api/v1/orders:
     get:
       consumes:
@@ -1371,6 +1611,175 @@ paths:
       summary: Get Paginated Restricts
       tags:
       - Restrict
+  /api/v1/reviews:
+    post:
+      consumes:
+      - application/json
+      description: Create a review for a specific game
+      parameters:
+      - description: Review details
+        in: body
+        name: review
+        required: true
+        schema:
+          $ref: '#/definitions/models.Review'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/models.Review'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Create Review
+      tags:
+      - Review
+  /api/v1/reviews/{review_id}:
+    get:
+      consumes:
+      - application/json
+      description: Get a specific review by its ID
+      parameters:
+      - description: Review ID
+        in: path
+        name: review_id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Review'
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Get Review by ID
+      tags:
+      - Review
+  /api/v1/reviews/{review_id}/user/{user_id}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete a specific review
+      parameters:
+      - description: Review ID
+        in: path
+        name: review_id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Delete Review
+      tags:
+      - Review
+    patch:
+      consumes:
+      - application/json
+      description: Update an existing review
+      parameters:
+      - description: Review ID
+        in: path
+        name: review_id
+        required: true
+        type: integer
+      - description: Updated Review details
+        in: body
+        name: review
+        required: true
+        schema:
+          $ref: '#/definitions/dto.ReviewDTO'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Review'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Update Review
+      tags:
+      - Review
+  /api/v1/reviews/game/{game_id}:
+    get:
+      consumes:
+      - application/json
+      description: Get all reviews for a specific game
+      parameters:
+      - description: Game ID
+        in: path
+        name: game_id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.Review'
+            type: array
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Get Reviews by Game ID
+      tags:
+      - Review
   /api/v1/roles:
     get:
       description: This endpoint allows an admin to fetch all roles.
