@@ -31,6 +31,7 @@ func main() {
 	// Инициализация базы данных
 	database.ConnectToDB()
 	database.MigrateDB()
+	database.CheckAdminAndRoles()
 
 	// Инициализация маршрутов
 	router := gin.Default()
