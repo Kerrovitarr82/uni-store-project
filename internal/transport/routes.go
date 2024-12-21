@@ -2,8 +2,11 @@ package transport
 
 import (
 	"TIPPr4/internal/controllers/cartControllers"
+	"TIPPr4/internal/controllers/favoriteControllers"
 	"TIPPr4/internal/controllers/gameControllers"
+	"TIPPr4/internal/controllers/libraryControllers"
 	"TIPPr4/internal/controllers/orderControllers"
+	"TIPPr4/internal/controllers/reviewControllers"
 	"TIPPr4/internal/controllers/userControllers"
 	"TIPPr4/internal/middleware"
 	"github.com/gin-gonic/gin"
@@ -92,6 +95,28 @@ func InitRoutes(router *gin.Engine) {
 			orders.GET("/:order_id", orderControllers.GetOrderByID())
 			orders.GET("/user/:user_id", orderControllers.GetUserOrders())
 			orders.GET("/", orderControllers.GetAllOrders())
+		}
+		favorite := v1.Group("/favorite")
+		{
+			favorite.Use(middleware.Authenticate())
+			favorite.POST("/:user_id/add/:user_id", favoriteControllers.AddGameToFavorite())
+			favorite.GET("/:user_id", favoriteControllers.GetFavorite())
+			favorite.DELETE("/:user_id/remove/:game_id", favoriteControllers.RemoveGameFromFavorite())
+			favorite.DELETE("/:user_id/clear", favoriteControllers.ClearFavorite())
+		}
+		library := v1.Group("/library")
+		{
+			library.Use(middleware.Authenticate())
+			library.GET("/:user_id", libraryControllers.GetLibrary())
+		}
+		reviews := v1.Group("/reviews")
+		{
+			reviews.Use(middleware.Authenticate())
+			reviews.POST("/", reviewControllers.CreateReview())
+			reviews.GET("/:review_id", reviewControllers.GetReviewByID())
+			reviews.GET("/:game_id", reviewControllers.GetReviewsByGameID())
+			reviews.PATCH("/:review_id/user/:user_id", reviewControllers.UpdateReview())
+			reviews.DELETE("/:review_id/user/:user_id", reviewControllers.DeleteReview())
 		}
 	}
 

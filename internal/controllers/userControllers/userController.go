@@ -37,6 +37,8 @@ func Signup() gin.HandlerFunc {
 		defer cancel()
 		var user models.User
 		var cart models.ShoppingCart
+		var favorite models.Favorite
+		var library models.Library
 
 		if err := c.BindJSON(&user); err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
@@ -78,9 +80,20 @@ func Signup() gin.HandlerFunc {
 		}
 
 		cart.User = user
-
 		if err := database.DB.WithContext(ctx).Create(&cart).Error; err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": "Cart item was not created"})
+			return
+		}
+
+		favorite.User = user
+		if err := database.DB.WithContext(ctx).Create(&favorite).Error; err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Favorite item was not created"})
+			return
+		}
+
+		library.User = user
+		if err := database.DB.WithContext(ctx).Create(&library).Error; err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Favorite item was not created"})
 			return
 		}
 

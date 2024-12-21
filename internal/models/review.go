@@ -11,9 +11,9 @@ type Review struct {
 	Description string         `json:"description"`
 	Rating      int            `gorm:"not null" json:"rating"`
 	GameId      int            `json:"game_id"`
-	Game        Game           `gorm:"foreignKey:GameId" json:"gameControllers"`
+	Game        Game           `gorm:"foreignKey:GameId" json:"game"`
 	UserID      int            `json:"user_id"`
-	User        User           `gorm:"foreignKey:UserID" json:"userControllers"`
+	User        User           `gorm:"foreignKey:UserID" json:"user"`
 	CreatedAt   time.Time      `json:"created_at"`
 	UpdatedAt   time.Time      `json:"updated_at"`
 	DeletedAt   gorm.DeletedAt `gorm:"index" json:"deleted_at" swaggerignore:"true"`

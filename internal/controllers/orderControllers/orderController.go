@@ -29,17 +29,28 @@ func CreateOrderFromCart() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var ctx, cancel = context.WithTimeout(context.Background(), 15*time.Second)
 		defer cancel()
+
 		userID := c.Param("user_id")
 		if err := helpers.MatchUserTypeToUid(c, userID); err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 			return
 		}
 
-		// Проверка наличия пользователя
 		var user models.User
+		var library models.Library
+
 		if err := database.DB.WithContext(ctx).First(&user, userID).Error; err != nil {
 			if errors.Is(err, gorm.ErrRecordNotFound) {
 				c.JSON(http.StatusNotFound, gin.H{"error": "User not found"})
+				return
+			}
+			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+			return
+		}
+
+		if err := database.DB.WithContext(ctx).First(&library, userID).Error; err != nil {
+			if errors.Is(err, gorm.ErrRecordNotFound) {
+				c.JSON(http.StatusNotFound, gin.H{"error": "User library not found"})
 				return
 			}
 			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
@@ -83,6 +94,12 @@ func CreateOrderFromCart() gin.HandlerFunc {
 
 		// Очистка корзины после создания заказа
 		if err := database.DB.WithContext(ctx).Model(&cart).Association("Games").Clear(); err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+			return
+		}
+
+		// Добавление игр в библиотеку
+		if err := database.DB.WithContext(ctx).Model(&library).Association("Games").Append(order.Games); err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 			return
 		}
