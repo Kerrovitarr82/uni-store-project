@@ -6,10 +6,10 @@ import (
 	"TIPPr4/internal/helpers"
 	"TIPPr4/internal/models"
 	"context"
-	"github.com/gin-gonic/gin"
 	"net/http"
-	"strconv"
 	"time"
+
+	"github.com/gin-gonic/gin"
 )
 
 // CreateReview godoc
@@ -18,37 +18,39 @@ import (
 // @Tags Review
 // @Accept json
 // @Produce json
-// @Param review body models.Review true "Review details"
+// @Param review body dto.ReviewDTO true "Review details"
 // @Success 201 {object} models.Review
 // @Failure 400 {object} map[string]interface{}
 // @Failure 500 {object} map[string]interface{}
-// @Router /api/v1/reviews [post]
+// @Router /api/v1/reviews/{game_id}/user/{user_id} [post]
 func CreateReview() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var ctx, cancel = context.WithTimeout(context.Background(), 15*time.Second)
 		defer cancel()
 
 		var review models.Review
+		var userID = c.Param("user_id")
+		var gameID = c.Param("game_id")
 
 		if err := c.ShouldBindJSON(&review); err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid input"})
 			return
 		}
 
-		if err := helpers.MatchUserTypeToUid(c, strconv.Itoa(review.UserID)); err != nil {
+		if err := helpers.MatchUserTypeToUid(c, userID); err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 			return
 		}
 
 		// Проверка пользователя и игры
 		var user models.User
-		if err := database.DB.WithContext(ctx).First(&user, review.UserID).Error; err != nil {
+		if err := database.DB.WithContext(ctx).First(&user, userID).Error; err != nil {
 			c.JSON(http.StatusNotFound, gin.H{"error": "User not found"})
 			return
 		}
 
 		var game models.Game
-		if err := database.DB.WithContext(ctx).First(&game, review.GameId).Error; err != nil {
+		if err := database.DB.WithContext(ctx).First(&game, gameID).Error; err != nil {
 			c.JSON(http.StatusNotFound, gin.H{"error": "Game not found"})
 			return
 		}
@@ -72,7 +74,7 @@ func CreateReview() gin.HandlerFunc {
 // @Accept json
 // @Produce json
 // @Param review_id path int true "Review ID"
-// @Param review body dto.ReviewDTO true "Updated Review details"
+// @Param review body dto.ReviewUpdateDTO true "Updated Review details"
 // @Success 200 {object} models.Review
 // @Failure 400 {object} map[string]interface{}
 // @Failure 404 {object} map[string]interface{}
@@ -96,7 +98,7 @@ func UpdateReview() gin.HandlerFunc {
 			return
 		}
 
-		var updateData dto.ReviewDTO
+		var updateData dto.ReviewUpdateDTO
 		if err := c.ShouldBindJSON(&updateData); err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid input"})
 			return

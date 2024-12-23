@@ -20,6 +20,13 @@ definitions:
     - description
     - name
     type: object
+  dto.CategoryUpdateDTO:
+    properties:
+      description:
+        type: string
+      name:
+        type: string
+    type: object
   dto.DeveloperDTO:
     properties:
       country:
@@ -35,6 +42,17 @@ definitions:
     - description
     - email
     - name
+    type: object
+  dto.DeveloperUpdateDTO:
+    properties:
+      country:
+        type: string
+      description:
+        type: string
+      email:
+        type: string
+      name:
+        type: string
     type: object
   dto.FavoriteDTO:
     properties:
@@ -74,6 +92,29 @@ definitions:
     - name
     - price
     type: object
+  dto.GameUpdateDTO:
+    properties:
+      age_restriction:
+        type: string
+      category_ids:
+        items:
+          type: integer
+        type: array
+      description:
+        type: string
+      developer_id:
+        type: integer
+      name:
+        type: string
+      price:
+        type: number
+      restrict_ids:
+        items:
+          type: integer
+        type: array
+      size:
+        type: number
+    type: object
   dto.LibraryDTO:
     properties:
       games:
@@ -110,7 +151,26 @@ definitions:
     - game_id
     - region
     type: object
+  dto.RestrictUpdateDTO:
+    properties:
+      game_id:
+        type: integer
+      region:
+        type: string
+    type: object
   dto.ReviewDTO:
+    properties:
+      description:
+        type: string
+      rating:
+        type: integer
+      title:
+        type: string
+    required:
+    - rating
+    - title
+    type: object
+  dto.ReviewUpdateDTO:
     properties:
       description:
         type: string
@@ -687,7 +747,7 @@ paths:
         name: category
         required: true
         schema:
-          $ref: '#/definitions/dto.CategoryDTO'
+          $ref: '#/definitions/dto.CategoryUpdateDTO'
       produces:
       - application/json
       responses:
@@ -874,7 +934,7 @@ paths:
         name: developer
         required: true
         schema:
-          $ref: '#/definitions/dto.DeveloperDTO'
+          $ref: '#/definitions/dto.DeveloperUpdateDTO'
       produces:
       - application/json
       responses:
@@ -1208,7 +1268,7 @@ paths:
         name: gameControllers
         required: true
         schema:
-          $ref: '#/definitions/dto.GameDTO'
+          $ref: '#/definitions/dto.GameUpdateDTO'
       produces:
       - application/json
       responses:
@@ -1543,7 +1603,7 @@ paths:
         name: restrict
         required: true
         schema:
-          $ref: '#/definitions/dto.RestrictDTO'
+          $ref: '#/definitions/dto.RestrictUpdateDTO'
       produces:
       - application/json
       responses:
@@ -1601,7 +1661,7 @@ paths:
       summary: Get Paginated Restricts
       tags:
       - Restrict
-  /api/v1/reviews:
+  /api/v1/reviews/{game_id}/user/{user_id}:
     post:
       consumes:
       - application/json
@@ -1612,7 +1672,7 @@ paths:
         name: review
         required: true
         schema:
-          $ref: '#/definitions/models.Review'
+          $ref: '#/definitions/dto.ReviewDTO'
       produces:
       - application/json
       responses:
@@ -1711,7 +1771,7 @@ paths:
         name: review
         required: true
         schema:
-          $ref: '#/definitions/dto.ReviewDTO'
+          $ref: '#/definitions/dto.ReviewUpdateDTO'
       produces:
       - application/json
       responses:

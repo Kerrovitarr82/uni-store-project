@@ -6,11 +6,12 @@ import (
 	"TIPPr4/internal/helpers"
 	"TIPPr4/internal/models"
 	"errors"
-	"github.com/gin-gonic/gin"
-	"gorm.io/gorm"
 	"math"
 	"net/http"
 	"strconv"
+
+	"github.com/gin-gonic/gin"
+	"gorm.io/gorm"
 )
 
 // CreateGame godoc
@@ -162,7 +163,7 @@ func GetPaginatedGames() gin.HandlerFunc {
 // @Accept json
 // @Produce json
 // @Param id path int true "Game ID"
-// @Param gameControllers body dto.GameDTO true "Game Data"
+// @Param gameControllers body dto.GameUpdateDTO true "Game Data"
 // @Success 200 {object} models.Game
 // @Failure 400 {object} map[string]interface{} "Validation Error"
 // @Failure 401 {object} map[string]interface{} "Unauthorized"
@@ -175,7 +176,7 @@ func UpdateGame() gin.HandlerFunc {
 			return
 		}
 
-		var d dto.GameDTO
+		var d dto.GameUpdateDTO
 		id := c.Param("game_id")
 
 		if err := c.ShouldBindJSON(&d); err != nil {

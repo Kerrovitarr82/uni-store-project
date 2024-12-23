@@ -6,11 +6,12 @@ import (
 	"TIPPr4/internal/helpers"
 	"TIPPr4/internal/models"
 	"errors"
-	"github.com/gin-gonic/gin"
-	"gorm.io/gorm"
 	"math"
 	"net/http"
 	"strconv"
+
+	"github.com/gin-gonic/gin"
+	"gorm.io/gorm"
 )
 
 // CreateCategory godoc
@@ -146,7 +147,7 @@ func GetPaginatedCategories() gin.HandlerFunc {
 // @Accept json
 // @Produce json
 // @Param id path int true "Category ID"
-// @Param category body dto.CategoryDTO true "Category Data"
+// @Param category body dto.CategoryUpdateDTO true "Category Data"
 // @Success 200 {object} models.Category
 // @Failure 400 {object} map[string]interface{} "Validation Error"
 // @Failure 401 {object} map[string]interface{} "Unauthorized"
@@ -159,7 +160,7 @@ func UpdateCategory() gin.HandlerFunc {
 			return
 		}
 
-		var d dto.CategoryDTO
+		var d dto.CategoryUpdateDTO
 		id := c.Param("category_id")
 
 		if err := c.ShouldBindJSON(&d); err != nil {

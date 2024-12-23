@@ -582,7 +582,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/dto.CategoryDTO"
+                            "$ref": "#/definitions/dto.CategoryUpdateDTO"
                         }
                     }
                 ],
@@ -858,7 +858,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/dto.DeveloperDTO"
+                            "$ref": "#/definitions/dto.DeveloperUpdateDTO"
                         }
                     }
                 ],
@@ -1349,7 +1349,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/dto.GameDTO"
+                            "$ref": "#/definitions/dto.GameUpdateDTO"
                         }
                     }
                 ],
@@ -1845,7 +1845,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/dto.RestrictDTO"
+                            "$ref": "#/definitions/dto.RestrictUpdateDTO"
                         }
                     }
                 ],
@@ -1872,54 +1872,6 @@ const docTemplate = `{
                     },
                     "404": {
                         "description": "Restrict Not Found",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    }
-                }
-            }
-        },
-        "/api/v1/reviews": {
-            "post": {
-                "description": "Create a review for a specific game",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Review"
-                ],
-                "summary": "Create Review",
-                "parameters": [
-                    {
-                        "description": "Review details",
-                        "name": "review",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/models.Review"
-                        }
-                    }
-                ],
-                "responses": {
-                    "201": {
-                        "description": "Created",
-                        "schema": {
-                            "$ref": "#/definitions/models.Review"
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
                         "schema": {
                             "type": "object",
                             "additionalProperties": true
@@ -1962,6 +1914,54 @@ const docTemplate = `{
                     },
                     "404": {
                         "description": "Not Found",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/reviews/{game_id}/user/{user_id}": {
+            "post": {
+                "description": "Create a review for a specific game",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Review"
+                ],
+                "summary": "Create Review",
+                "parameters": [
+                    {
+                        "description": "Review details",
+                        "name": "review",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.ReviewDTO"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/models.Review"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
                         "schema": {
                             "type": "object",
                             "additionalProperties": true
@@ -2095,7 +2095,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/dto.ReviewDTO"
+                            "$ref": "#/definitions/dto.ReviewUpdateDTO"
                         }
                     }
                 ],
@@ -2629,6 +2629,17 @@ const docTemplate = `{
                 }
             }
         },
+        "dto.CategoryUpdateDTO": {
+            "type": "object",
+            "properties": {
+                "description": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                }
+            }
+        },
         "dto.DeveloperDTO": {
             "type": "object",
             "required": [
@@ -2637,6 +2648,23 @@ const docTemplate = `{
                 "email",
                 "name"
             ],
+            "properties": {
+                "country": {
+                    "type": "string"
+                },
+                "description": {
+                    "type": "string"
+                },
+                "email": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                }
+            }
+        },
+        "dto.DeveloperUpdateDTO": {
+            "type": "object",
             "properties": {
                 "country": {
                     "type": "string"
@@ -2676,6 +2704,41 @@ const docTemplate = `{
                 "name",
                 "price"
             ],
+            "properties": {
+                "age_restriction": {
+                    "type": "string"
+                },
+                "category_ids": {
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    }
+                },
+                "description": {
+                    "type": "string"
+                },
+                "developer_id": {
+                    "type": "integer"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "price": {
+                    "type": "number"
+                },
+                "restrict_ids": {
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    }
+                },
+                "size": {
+                    "type": "number"
+                }
+            }
+        },
+        "dto.GameUpdateDTO": {
+            "type": "object",
             "properties": {
                 "age_restriction": {
                     "type": "string"
@@ -2764,7 +2827,36 @@ const docTemplate = `{
                 }
             }
         },
+        "dto.RestrictUpdateDTO": {
+            "type": "object",
+            "properties": {
+                "game_id": {
+                    "type": "integer"
+                },
+                "region": {
+                    "type": "string"
+                }
+            }
+        },
         "dto.ReviewDTO": {
+            "type": "object",
+            "required": [
+                "rating",
+                "title"
+            ],
+            "properties": {
+                "description": {
+                    "type": "string"
+                },
+                "rating": {
+                    "type": "integer"
+                },
+                "title": {
+                    "type": "string"
+                }
+            }
+        },
+        "dto.ReviewUpdateDTO": {
             "type": "object",
             "properties": {
                 "description": {

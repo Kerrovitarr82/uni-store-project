@@ -6,11 +6,12 @@ import (
 	"TIPPr4/internal/helpers"
 	"TIPPr4/internal/models"
 	"errors"
-	"github.com/gin-gonic/gin"
-	"gorm.io/gorm"
 	"math"
 	"net/http"
 	"strconv"
+
+	"github.com/gin-gonic/gin"
+	"gorm.io/gorm"
 )
 
 // CreateDeveloper godoc
@@ -148,7 +149,7 @@ func GetPaginatedDevelopers() gin.HandlerFunc {
 // @Accept json
 // @Produce json
 // @Param id path int true "Developer ID"
-// @Param developer body dto.DeveloperDTO true "Developer Data"
+// @Param developer body dto.DeveloperUpdateDTO true "Developer Data"
 // @Success 200 {object} models.Developer
 // @Failure 400 {object} map[string]interface{} "Validation Error"
 // @Failure 401 {object} map[string]interface{} "Unauthorized"
@@ -161,7 +162,7 @@ func UpdateDeveloper() gin.HandlerFunc {
 			return
 		}
 
-		var d dto.DeveloperDTO
+		var d dto.DeveloperUpdateDTO
 		id := c.Param("developer_id")
 
 		if err := c.ShouldBindJSON(&d); err != nil {

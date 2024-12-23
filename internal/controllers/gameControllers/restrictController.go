@@ -6,11 +6,12 @@ import (
 	"TIPPr4/internal/helpers"
 	"TIPPr4/internal/models"
 	"errors"
-	"github.com/gin-gonic/gin"
-	"gorm.io/gorm"
 	"math"
 	"net/http"
 	"strconv"
+
+	"github.com/gin-gonic/gin"
+	"gorm.io/gorm"
 )
 
 // CreateRestrict godoc
@@ -146,7 +147,7 @@ func GetPaginatedRestricts() gin.HandlerFunc {
 // @Accept json
 // @Produce json
 // @Param id path int true "Restrict ID"
-// @Param restrict body dto.RestrictDTO true "Restrict Data"
+// @Param restrict body dto.RestrictUpdateDTO true "Restrict Data"
 // @Success 200 {object} models.Restrict
 // @Failure 400 {object} map[string]interface{} "Validation Error"
 // @Failure 401 {object} map[string]interface{} "Unauthorized"
@@ -159,7 +160,7 @@ func UpdateRestrict() gin.HandlerFunc {
 			return
 		}
 
-		var d dto.RestrictDTO
+		var d dto.RestrictUpdateDTO
 		id := c.Param("restrict_id")
 
 		if err := c.ShouldBindJSON(&d); err != nil {
