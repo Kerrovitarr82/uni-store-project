@@ -1,14 +1,14 @@
 package gameControllers
 
 import (
-	"TIPPr4/internal/database"
-	"TIPPr4/internal/dto"
-	"TIPPr4/internal/helpers"
-	"TIPPr4/internal/models"
 	"errors"
 	"math"
 	"net/http"
 	"strconv"
+	"uniStore/internal/database"
+	"uniStore/internal/dto"
+	"uniStore/internal/helpers"
+	"uniStore/internal/models"
 
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"

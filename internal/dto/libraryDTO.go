@@ -1,7 +1,7 @@
 package dto
 
 import (
-	"TIPPr4/internal/models"
+	"uniStore/internal/models"
 )
 
 type LibraryDTO struct {

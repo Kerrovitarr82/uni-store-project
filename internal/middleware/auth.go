@@ -1,9 +1,9 @@
 package middleware
 
 import (
-	"TIPPr4/internal/helpers"
 	"github.com/gin-gonic/gin"
 	"net/http"
+	"uniStore/internal/helpers"
 )
 
 func Authenticate() gin.HandlerFunc {

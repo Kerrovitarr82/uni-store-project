@@ -1,12 +1,12 @@
 package userControllers
 
 import (
-	"TIPPr4/internal/database"
-	"TIPPr4/internal/helpers"
-	"TIPPr4/internal/models"
 	"github.com/gin-gonic/gin"
 	"net/http"
 	"time"
+	"uniStore/internal/database"
+	"uniStore/internal/helpers"
+	"uniStore/internal/models"
 )
 
 // CreateRole godoc

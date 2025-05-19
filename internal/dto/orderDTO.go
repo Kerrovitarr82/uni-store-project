@@ -1,8 +1,8 @@
 package dto
 
 import (
-	"TIPPr4/internal/models"
 	"time"
+	"uniStore/internal/models"
 )
 
 type OrderDTO struct {

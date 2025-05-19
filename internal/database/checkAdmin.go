@@ -1,14 +1,14 @@
 package database
 
 import (
-	"TIPPr4/internal/models"
-	"TIPPr4/internal/myUtils"
 	"context"
 	"errors"
 	"gorm.io/gorm"
 	"log"
 	"os"
 	"time"
+	"uniStore/internal/models"
+	"uniStore/internal/myUtils"
 )
 
 func CheckAdminAndRoles() {

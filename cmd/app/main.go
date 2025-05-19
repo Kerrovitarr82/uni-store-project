@@ -1,15 +1,17 @@
 package main
 
 import (
-	_ "TIPPr4/api/docs"
-	"TIPPr4/internal/database"
-	"TIPPr4/internal/transport"
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
 	swaggerfiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
 	"log"
 	"os"
+	"uniStore/api/docs"
+	_ "uniStore/api/docs"
+	"uniStore/internal/database"
+	"uniStore/internal/myUtils"
+	"uniStore/internal/transport"
 )
 
 func initConfig() {
@@ -21,7 +23,7 @@ func initConfig() {
 
 // @title		Game Store
 // @version		1.0
-// @description	REST-API for gameControllers store
+// @description	REST-API for game store
 
 // @host		localhost:8080
 func main() {
@@ -43,8 +45,14 @@ func main() {
 		port = "8000"
 	}
 
+	if myUtils.IsProd() {
+		docs.SwaggerInfo.Host = "62.60.249.181:8080"
+	} else {
+		docs.SwaggerInfo.Host = "localhost:8080"
+		log.Printf("Swagger UI is available at: http://localhost:%s/swagger/index.html\n", port)
+	}
 	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerfiles.Handler))
-	log.Printf("Swagger UI is available at: http://localhost:%s/swagger/index.html\n", port)
+
 	// Запуск сервера
 	err := router.Run(":" + port)
 	if err != nil {

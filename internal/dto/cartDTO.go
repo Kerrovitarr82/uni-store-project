@@ -1,6 +1,6 @@
 package dto
 
-import "TIPPr4/internal/models"
+import "uniStore/internal/models"
 
 type CartDTO struct {
 	ID     int           `json:"id"`

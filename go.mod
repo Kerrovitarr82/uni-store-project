@@ -1,4 +1,4 @@
-module TIPPr4
+module uniStore
 
 go 1.23.2
 
