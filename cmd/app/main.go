@@ -21,9 +21,9 @@ func initConfig() {
 
 // @title		Game Store
 // @version		1.0
-// @description	REST-API for gameControllers store
+// @description	REST-API for game store
 
-// @host		localhost:8080
+// @host		62.60.249.181:8080
 func main() {
 	// Инициализация конфигурации
 	initConfig()
@@ -44,7 +44,7 @@ func main() {
 	}
 
 	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerfiles.Handler))
-	log.Printf("Swagger UI is available at: http://localhost:%s/swagger/index.html\n", port)
+	log.Printf("Swagger UI is available at: http://62.60.249.181:%s/swagger/index.html\n", port)
 	// Запуск сервера
 	err := router.Run(":" + port)
 	if err != nil {
