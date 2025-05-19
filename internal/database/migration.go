@@ -1,8 +1,8 @@
 package database
 
 import (
-	"TIPPr4/internal/models"
 	"log"
+	"uniStore/internal/models"
 )
 
 func MigrateDB() {

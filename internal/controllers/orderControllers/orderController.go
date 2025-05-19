@@ -1,10 +1,6 @@
 package orderControllers
 
 import (
-	"TIPPr4/internal/database"
-	"TIPPr4/internal/dto"
-	"TIPPr4/internal/helpers"
-	"TIPPr4/internal/models"
 	"context"
 	"errors"
 	"github.com/gin-gonic/gin"
@@ -12,6 +8,10 @@ import (
 	"net/http"
 	"strconv"
 	"time"
+	"uniStore/internal/database"
+	"uniStore/internal/dto"
+	"uniStore/internal/helpers"
+	"uniStore/internal/models"
 )
 
 // CreateOrderFromCart godoc

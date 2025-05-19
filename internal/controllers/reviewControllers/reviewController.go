@@ -1,13 +1,13 @@
 package reviewControllers
 
 import (
-	"TIPPr4/internal/database"
-	"TIPPr4/internal/dto"
-	"TIPPr4/internal/helpers"
-	"TIPPr4/internal/models"
 	"context"
 	"net/http"
 	"time"
+	"uniStore/internal/database"
+	"uniStore/internal/dto"
+	"uniStore/internal/helpers"
+	"uniStore/internal/models"
 
 	"github.com/gin-gonic/gin"
 )

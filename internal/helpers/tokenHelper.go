@@ -1,13 +1,13 @@
 package helpers
 
 import (
-	"TIPPr4/internal/database"
-	"TIPPr4/internal/models"
 	"context"
 	"fmt"
 	"github.com/golang-jwt/jwt/v5"
 	"os"
 	"time"
+	"uniStore/internal/database"
+	"uniStore/internal/models"
 )
 
 type SignedDetails struct {

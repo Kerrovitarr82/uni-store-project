@@ -1,15 +1,15 @@
 package transport
 
 import (
-	"TIPPr4/internal/controllers/cartControllers"
-	"TIPPr4/internal/controllers/favoriteControllers"
-	"TIPPr4/internal/controllers/gameControllers"
-	"TIPPr4/internal/controllers/libraryControllers"
-	"TIPPr4/internal/controllers/orderControllers"
-	"TIPPr4/internal/controllers/reviewControllers"
-	"TIPPr4/internal/controllers/userControllers"
-	"TIPPr4/internal/middleware"
 	"github.com/gin-gonic/gin"
+	"uniStore/internal/controllers/cartControllers"
+	"uniStore/internal/controllers/favoriteControllers"
+	"uniStore/internal/controllers/gameControllers"
+	"uniStore/internal/controllers/libraryControllers"
+	"uniStore/internal/controllers/orderControllers"
+	"uniStore/internal/controllers/reviewControllers"
+	"uniStore/internal/controllers/userControllers"
+	"uniStore/internal/middleware"
 )
 
 func InitRoutes(router *gin.Engine) {
