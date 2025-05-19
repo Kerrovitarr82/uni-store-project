@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/.idea/TIPCode.iml" filepath="$PROJECT_DIR$/.idea/TIPCode.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/uni-store-project.iml" filepath="$PROJECT_DIR$/.idea/uni-store-project.iml" />
     </modules>
   </component>
 </project>
