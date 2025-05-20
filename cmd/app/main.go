@@ -25,7 +25,7 @@ func initConfig() {
 // @version		1.0
 // @description	REST-API for game store
 
-// @host		127.0.0.1:8080
+// @host		gamestore.duckdns.org
 func main() {
 	file, err := os.OpenFile("app.log", os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0666)
 	if err != nil {
