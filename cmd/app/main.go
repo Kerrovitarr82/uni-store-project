@@ -7,7 +7,6 @@ import (
 	ginSwagger "github.com/swaggo/gin-swagger"
 	"log"
 	"os"
-	"uniStore/api/docs"
 	_ "uniStore/api/docs"
 	"uniStore/internal/database"
 	"uniStore/internal/myUtils"
@@ -50,11 +49,11 @@ func main() {
 	if port == "" {
 		port = "8000"
 	}
-	ip := os.Getenv("IP")
-	if ip == "" {
-		ip = "127.0.0.1"
-	}
-	docs.SwaggerInfo.Host = ip + ":8080"
+	//ip := os.Getenv("IP")
+	//if ip == "" {
+	//	ip = "127.0.0.1"
+	//}
+	//docs.SwaggerInfo.Host = ip + ":8080"
 	if !myUtils.IsProd() {
 		log.Printf("Swagger UI is available at: http://127.0.0.1:%s/swagger/index.html\n", port)
 	}
