@@ -27,6 +27,12 @@ func initConfig() {
 
 // @host		localhost:8080
 func main() {
+	file, err := os.OpenFile("app.log", os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0666)
+	if err != nil {
+		log.Fatal("Failed to open log file:", err)
+	}
+	log.SetOutput(file)
+
 	// Инициализация конфигурации
 	initConfig()
 
@@ -39,22 +45,23 @@ func main() {
 	router := gin.Default()
 	transport.InitRoutes(router)
 
-	// Получение порта из переменных окружения
+	// Получение порта и ip из переменных окружения
 	port := os.Getenv("PORT")
 	if port == "" {
 		port = "8000"
 	}
-
-	if myUtils.IsProd() {
-		docs.SwaggerInfo.Host = "62.60.249.181:8080"
-	} else {
-		docs.SwaggerInfo.Host = "localhost:8080"
+	ip := os.Getenv("IP")
+	if ip == "" {
+		ip = "localhost"
+	}
+	docs.SwaggerInfo.Host = ip + ":8080"
+	if !myUtils.IsProd() {
 		log.Printf("Swagger UI is available at: http://localhost:%s/swagger/index.html\n", port)
 	}
 	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerfiles.Handler))
 
 	// Запуск сервера
-	err := router.Run(":" + port)
+	err = router.Run(":" + port)
 	if err != nil {
 		log.Fatalf("Error starting server on port %s: %v", port, err)
 	}

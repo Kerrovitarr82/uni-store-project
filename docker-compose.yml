@@ -1,9 +1,27 @@
 services:
-  game-store:
+  game-store-1:
     build: ./
     command: ./game-store
     ports:
       - "8080:8080"
+    depends_on:
+      db:
+        condition: service_healthy
+
+  game-store-2:
+    build: ./
+    command: ./game-store
+    ports:
+      - "8081:8080"
+    depends_on:
+      db:
+        condition: service_healthy
+
+  game-store-3:
+    build: ./
+    command: ./game-store
+    ports:
+      - "8082:8080"
     depends_on:
       db:
         condition: service_healthy
