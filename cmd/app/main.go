@@ -25,7 +25,7 @@ func initConfig() {
 // @version		1.0
 // @description	REST-API for game store
 
-// @host		localhost:8080
+// @host		127.0.0.1:8080
 func main() {
 	file, err := os.OpenFile("app.log", os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0666)
 	if err != nil {
@@ -52,11 +52,11 @@ func main() {
 	}
 	ip := os.Getenv("IP")
 	if ip == "" {
-		ip = "localhost"
+		ip = "127.0.0.1"
 	}
 	docs.SwaggerInfo.Host = ip + ":8080"
 	if !myUtils.IsProd() {
-		log.Printf("Swagger UI is available at: http://localhost:%s/swagger/index.html\n", port)
+		log.Printf("Swagger UI is available at: http://127.0.0.1:%s/swagger/index.html\n", port)
 	}
 	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerfiles.Handler))
 
