@@ -15,7 +15,6 @@ import (
 func InitRoutes(router *gin.Engine) {
 	// Группировка маршрутов для аутентификации
 	v1 := router.Group("/api/v1")
-	v1.Use(middleware.CORSMiddleware())
 	{
 		auth := v1.Group("/auth")
 		{
