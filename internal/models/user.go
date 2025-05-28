@@ -25,7 +25,7 @@ type User struct {
 
 type Role struct {
 	ID          int            `gorm:"primaryKey" json:"id"`
-	Type        string         `gorm:"not null" json:"type"`
+	Type        string         `gorm:"unique;not null" json:"type"`
 	Description string         `json:"description"`
 	CreatedAt   time.Time      `json:"created_at"`
 	UpdatedAt   time.Time      `json:"updated_at"`
