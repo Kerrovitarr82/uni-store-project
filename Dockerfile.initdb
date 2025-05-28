@@ -1,0 +1,7 @@
+FROM golang:1.23.2
+
+WORKDIR /app
+COPY ./ ./
+RUN go mod download && go mod verify
+RUN go build -o initdb ./cmd/initdb/main.go
+CMD ["./initdb"]

@@ -1,17 +1,34 @@
-package database
+package main
 
 import (
 	"context"
 	"errors"
-	"gorm.io/gorm"
 	"log"
 	"os"
 	"time"
+
 	"uniStore/internal/models"
 	"uniStore/internal/myUtils"
+
+	"gorm.io/driver/postgres"
+	"gorm.io/gorm"
 )
 
-func CheckAdminAndRoles() {
+func main() {
+	var DB *gorm.DB
+	var err error
+	dsn := os.Getenv("DATABASE_URL")
+	for count := 0; count < 5; count++ {
+		DB, err = gorm.Open(postgres.Open(dsn), &gorm.Config{})
+		if err == nil {
+			return // успешное подключение
+		}
+		if count == 4 {
+			log.Fatal("Could not connect to the database after 5 attempts:", err)
+		}
+		log.Println("Failed to connect to database. Retrying...")
+		time.Sleep(5 * time.Second)
+	}
 	var ctx, cancel = context.WithTimeout(context.Background(), 15*time.Second)
 	defer cancel()
 	var role models.Role
@@ -39,8 +56,9 @@ func CheckAdminAndRoles() {
 			DB.Create(&role)
 		}
 	}
+	adminEmail := os.Getenv("FIRST_ADMIN_EMAIL")
 
-	if err := DB.WithContext(ctx).First(&user, "role_id = ?", 1).Error; err != nil {
+	if err := DB.WithContext(ctx).First(&user, "email = ?", adminEmail).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			hashedPass, err := myUtils.HashPassword(os.Getenv("FIRST_ADMIN_PASSWORD"))
 			if err != nil {
@@ -50,7 +68,7 @@ func CheckAdminAndRoles() {
 			user = models.User{
 				Name:        "Admin",
 				SecondName:  "1",
-				Email:       os.Getenv("FIRST_ADMIN_EMAIL"),
+				Email:       adminEmail,
 				PhoneNumber: "none",
 				Password:    hashedPass,
 				RoleID:      1,
