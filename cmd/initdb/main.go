@@ -1,84 +1,9 @@
 package main
 
-import (
-	"context"
-	"errors"
-	"log"
-	"os"
-	"time"
-
-	"uniStore/internal/models"
-	"uniStore/internal/myUtils"
-
-	"gorm.io/driver/postgres"
-	"gorm.io/gorm"
-)
+import "uniStore/internal/database"
 
 func main() {
-	var DB *gorm.DB
-	var err error
-	dsn := os.Getenv("DATABASE_URL")
-	for count := 0; count < 5; count++ {
-		DB, err = gorm.Open(postgres.Open(dsn), &gorm.Config{})
-		if err == nil {
-			return // успешное подключение
-		}
-		if count == 4 {
-			log.Fatal("Could not connect to the database after 5 attempts:", err)
-		}
-		log.Println("Failed to connect to database. Retrying...")
-		time.Sleep(5 * time.Second)
-	}
-	var ctx, cancel = context.WithTimeout(context.Background(), 15*time.Second)
-	defer cancel()
-	var role models.Role
-	var user models.User
-
-	if err := DB.WithContext(ctx).First(&role, "type = ?", "ADMIN").Error; err != nil {
-		if errors.Is(err, gorm.ErrRecordNotFound) {
-			role = models.Role{
-				Type:        "ADMIN",
-				Description: "Позволяет проводить все операции",
-				CreatedAt:   time.Now(),
-				UpdatedAt:   time.Now(),
-			}
-			DB.Create(&role)
-		}
-	}
-	if err := DB.WithContext(ctx).First(&role, "type = ?", "USER").Error; err != nil {
-		if errors.Is(err, gorm.ErrRecordNotFound) {
-			role = models.Role{
-				Type:        "USER",
-				Description: "Позволяет проводить базовые операции юзера",
-				CreatedAt:   time.Now(),
-				UpdatedAt:   time.Now(),
-			}
-			DB.Create(&role)
-		}
-	}
-	adminEmail := os.Getenv("FIRST_ADMIN_EMAIL")
-
-	if err := DB.WithContext(ctx).First(&user, "email = ?", adminEmail).Error; err != nil {
-		if errors.Is(err, gorm.ErrRecordNotFound) {
-			hashedPass, err := myUtils.HashPassword(os.Getenv("FIRST_ADMIN_PASSWORD"))
-			if err != nil {
-				log.Fatal("Failed to hash password for admin")
-				return
-			}
-			user = models.User{
-				Name:        "Admin",
-				SecondName:  "1",
-				Email:       adminEmail,
-				PhoneNumber: "none",
-				Password:    hashedPass,
-				RoleID:      1,
-				Role: models.Role{
-					ID: 1,
-				},
-				CreatedAt: time.Now(),
-				UpdatedAt: time.Now(),
-			}
-			DB.Create(&user)
-		}
-	}
+	database.ConnectToDB()
+	database.MigrateDB()
+	database.CheckRoles()
 }

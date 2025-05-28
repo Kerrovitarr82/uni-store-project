@@ -24,7 +24,7 @@ func initConfig() {
 // @version		1.0
 // @description	REST-API for game store
 
-// @host		gamestore.duckdns.org
+// @host		https://gamestore.duckdns.org/
 func main() {
 	file, err := os.OpenFile("app.log", os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0666)
 	if err != nil {
@@ -37,7 +37,6 @@ func main() {
 
 	// Инициализация базы данных
 	database.ConnectToDB()
-	database.MigrateDB()
 
 	// Инициализация маршрутов
 	router := gin.Default()
@@ -48,13 +47,8 @@ func main() {
 	if port == "" {
 		port = "8000"
 	}
-	//ip := os.Getenv("IP")
-	//if ip == "" {
-	//	ip = "127.0.0.1"
-	//}
-	//docs.SwaggerInfo.Host = ip + ":8080"
 	if !myUtils.IsProd() {
-		log.Printf("Swagger UI is available at: http://127.0.0.1:%s/swagger/index.html\n", port)
+		log.Printf("Swagger UI is available at: http://localhost:%s/swagger/index.html\n", port)
 	}
 	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerfiles.Handler))
 
