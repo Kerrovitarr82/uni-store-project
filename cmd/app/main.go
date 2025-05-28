@@ -9,6 +9,7 @@ import (
 	"os"
 	_ "uniStore/api/docs"
 	"uniStore/internal/database"
+	"uniStore/internal/middleware"
 	"uniStore/internal/myUtils"
 	"uniStore/internal/transport"
 )
@@ -40,6 +41,7 @@ func main() {
 
 	// Инициализация маршрутов
 	router := gin.Default()
+	router.Use(middleware.CORSMiddleware())
 	transport.InitRoutes(router)
 
 	// Получение порта и ip из переменных окружения
