@@ -3,6 +3,7 @@ package favoriteControllers
 import (
 	"context"
 	"errors"
+	"fmt"
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
 	"net/http"
@@ -38,6 +39,8 @@ func AddGameToFavorite() gin.HandlerFunc {
 			return
 		}
 
+		fmt.Printf("Adding to favorite: user_id = %s, game_id = %s\n", userID, gameID)
+
 		// Проверка наличия пользователя
 		var user models.User
 		if err := database.DB.WithContext(ctx).First(&user, userID).Error; err != nil {
@@ -59,6 +62,7 @@ func AddGameToFavorite() gin.HandlerFunc {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 			return
 		}
+		fmt.Println(game)
 
 		var favorite models.Favorite
 		if err := database.DB.WithContext(ctx).Where("user_id = ?", userID).First(&favorite).Error; err != nil {
@@ -69,8 +73,8 @@ func AddGameToFavorite() gin.HandlerFunc {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 			return
 		}
+		fmt.Println(favorite)
 
-		// Добавление игры в корзину
 		if err := database.DB.WithContext(ctx).Model(&favorite).Association("Games").Append(&game); err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 			return

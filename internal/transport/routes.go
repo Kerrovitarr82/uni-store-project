@@ -99,7 +99,7 @@ func InitRoutes(router *gin.Engine) {
 		favorite := v1.Group("/favorite")
 		{
 			favorite.Use(middleware.Authenticate())
-			favorite.POST("/:user_id/add/:user_id", favoriteControllers.AddGameToFavorite())
+			favorite.POST("/:user_id/add/:game_id", favoriteControllers.AddGameToFavorite())
 			favorite.GET("/:user_id", favoriteControllers.GetFavorite())
 			favorite.DELETE("/:user_id/remove/:game_id", favoriteControllers.RemoveGameFromFavorite())
 			favorite.DELETE("/:user_id/clear", favoriteControllers.ClearFavorite())
@@ -112,7 +112,7 @@ func InitRoutes(router *gin.Engine) {
 		reviews := v1.Group("/reviews")
 		{
 			reviews.Use(middleware.Authenticate())
-			reviews.POST("/", reviewControllers.CreateReview())
+			reviews.POST("/:game_id/user/:user_id", reviewControllers.CreateReview())
 			reviews.GET("/:review_id", reviewControllers.GetReviewByID())
 			reviews.GET("/game/:game_id", reviewControllers.GetReviewsByGameID())
 			reviews.PATCH("/:review_id/user/:user_id", reviewControllers.UpdateReview())
