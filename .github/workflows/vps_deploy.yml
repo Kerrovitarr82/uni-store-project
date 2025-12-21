@@ -47,5 +47,5 @@ jobs:
           port: 2156
           script: |
             cd ${{ secrets.PROJECT_DIR }}
-            docker-compose down
-            docker-compose up -d --build
+            docker compose down
+            docker compose up -d --build
