@@ -34,6 +34,7 @@ jobs:
           host: ${{ secrets.VPS_HOST }}
           username: ${{ secrets.VPS_USER }}
           key: ${{ secrets.VPS_SSH_KEY }}
+          port: 2156
           source: "."
           target: ${{ secrets.PROJECT_DIR }}
 
@@ -43,6 +44,7 @@ jobs:
           host: ${{ secrets.VPS_HOST }}
           username: ${{ secrets.VPS_USER }}
           key: ${{ secrets.VPS_SSH_KEY }}
+          port: 2156
           script: |
             cd ${{ secrets.PROJECT_DIR }}
             docker-compose down
