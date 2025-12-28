@@ -148,8 +148,9 @@ func Login() gin.HandlerFunc {
 		}
 
 		// Установка токена в cookie
-		c.SetCookie("token", token, 3600*2, "/", "gamestore.duckdns.org", true, true)
-		c.SetCookie("refreshToken", refreshToken, 3600*24*7, "/", "gamestore.duckdns.org", true, true)
+		c.SetSameSite(http.SameSiteLaxMode)
+		c.SetCookie("token", token, 3600*2, "/", "", true, true)
+		c.SetCookie("refreshToken", refreshToken, 3600*24*7, "/", "", true, true)
 
 		c.JSON(http.StatusOK, foundUser)
 	}
