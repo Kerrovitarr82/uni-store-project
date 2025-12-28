@@ -25,7 +25,7 @@ func initConfig() {
 // @version		1.0
 // @description	REST-API for game store
 
-// @host		gamestore.duckdns.org
+// @host		gamestore.duckdns.org:9443
 func main() {
 	file, err := os.OpenFile("app.log", os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0666)
 	if err != nil {
@@ -33,18 +33,14 @@ func main() {
 	}
 	log.SetOutput(file)
 
-	// Инициализация конфигурации
 	initConfig()
 
-	// Инициализация базы данных
 	database.ConnectToDB()
 
-	// Инициализация маршрутов
 	router := gin.Default()
 	router.Use(middleware.CORSMiddleware())
 	transport.InitRoutes(router)
 
-	// Получение порта и ip из переменных окружения
 	port := os.Getenv("PORT")
 	if port == "" {
 		port = "8000"
