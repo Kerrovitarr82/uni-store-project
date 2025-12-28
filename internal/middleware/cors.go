@@ -9,6 +9,7 @@ func CORSMiddleware() gin.HandlerFunc {
 		// Список разрешенных origins
 		allowedOrigins := map[string]bool{
 			"http://localhost:5173":              true, // Фронт для тестов на локалке
+			"https://gamestore.duckdns.org:3000": true, // Фронт для впс
 			"https://gamestore.duckdns.org:9443": true,
 		}
 
